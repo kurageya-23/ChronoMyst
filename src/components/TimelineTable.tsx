@@ -18,20 +18,20 @@ const TimelineTable: React.FC = () => {
   const spanMap = useMemo(() => {
     const map: Record<string, number[]> = {};
     characters.forEach((c) => {
-      map[c.playerName] = times.map(() => 1);
+      map[c.name] = times.map(() => 1);
     });
 
     events.forEach((ev) => {
-      if (!ev.endTime || !ev.characterName) return;
+      if (!ev.endTime || !ev.characters) return;
       const start = times.indexOf(ev.startTime);
       const end = times.indexOf(ev.endTime);
       if (start < 0 || end < 0 || end < start) return;
 
       const span = end - start + 1;
-      ev.characterName.forEach((pn) => {
-        map[pn][start] = span; // 開始行に結合数をセット
+      ev.characters.forEach((c) => {
+        map[c.name][start] = span; // 開始行に結合数をセット
         for (let i = start + 1; i <= end; i++) {
-          map[pn][i] = 0; // 結合された行はスキップマーク
+          map[c.name][i] = 0; // 結合された行はスキップマーク
         }
       });
     });
@@ -41,13 +41,13 @@ const TimelineTable: React.FC = () => {
 
   return (
     <ScrollArea>
-      <Table horizontalSpacing="md" verticalSpacing="xs">
+      <Table horizontalSpacing="md" verticalSpacing="xs" border={1}>
         <thead>
           <tr>
             <th></th>
             {characters.map((char) => (
-              <th key={char.playerName}>
-                <Text maw={200}>{char.playerName}</Text>
+              <th key={char.name}>
+                <Text maw={200}>{char.name}</Text>
               </th>
             ))}
           </tr>
@@ -56,13 +56,13 @@ const TimelineTable: React.FC = () => {
           {times.map((time, rowIndex) => (
             <tr key={time}>
               {/* 時間ラベル */}
-              <th>
+              <th style={{ verticalAlign: "top" }}>
                 <Text maw={200}>{time}</Text>
               </th>
 
               {/* 各キャラ列 */}
               {characters.map((char) => {
-                const span = spanMap[char.playerName][rowIndex];
+                const span = spanMap[char.name][rowIndex];
                 if (span === 0) {
                   // すでに上のセルで縦結合されている部分なので何も描かない
                   return null;
@@ -72,12 +72,12 @@ const TimelineTable: React.FC = () => {
                 const ev = events.find(
                   (e) =>
                     e.startTime === time &&
-                    e.characterName?.includes(char.playerName)
+                    e.characters?.map((c) => c.name).includes(char.name)
                 );
 
                 return (
                   <td
-                    key={char.playerName}
+                    key={char.name}
                     rowSpan={span}
                     style={{ minWidth: 120, verticalAlign: "top" }}
                   >

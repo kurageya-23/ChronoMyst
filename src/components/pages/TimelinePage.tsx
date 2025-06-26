@@ -4,7 +4,7 @@ import {
   type Timeline,
 } from "../../features/timelines/timelineSlice";
 import type { RootState } from "../../app/store";
-import { Container, Paper, Title, Text } from "@mantine/core";
+import { Paper, Title, Text, Grid } from "@mantine/core";
 import TimelineTable from "../TimelineTable";
 import TimelineConfigCard from "../TimelineConfigCard";
 
@@ -15,24 +15,21 @@ function TimelinePage() {
 
   return (
     <>
-      <Container my="lg">
-        <Title order={2}>シナリオ</Title>
-        <Paper withBorder shadow="sm" p="md" mt="md">
-          <Text size="xl" maw={500}>
-            {timeline.scenario.name}
-          </Text>
-          <Text color="dimmed" size="sm" mb="md">
-            {timeline.scenario.name}
-          </Text>
-          <Text color="dimmed" size="sm" mb="md">
-            {timeline.times[0]} ー {timeline.times[timeline.times.length - 1]}
-          </Text>
-        </Paper>
-      </Container>
-
-      <TimelineConfigCard />
-
-      <TimelineTable />
+      <Grid>
+        <Grid.Col span={8}>
+          <TimelineConfigCard />
+          <TimelineTable />
+        </Grid.Col>
+        <Grid.Col span={4}>
+          <Title order={5}>シナリオ情報</Title>
+          <Paper withBorder shadow="sm" p="sm">
+            <Text size="md">{timeline.scenario.name}</Text>
+            <Text color="dimmed" size="sm" mb="md">
+              {timeline.times[0]} ー {timeline.times[timeline.times.length - 1]}
+            </Text>
+          </Paper>
+        </Grid.Col>
+      </Grid>
     </>
   );
 }

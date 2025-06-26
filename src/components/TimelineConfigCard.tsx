@@ -9,6 +9,7 @@ import {
 import { useForm } from "@mantine/form";
 import {
   timelineSlice,
+  type Character,
   type Timeline,
   type TimelineConfig,
 } from "../features/timelines/timelineSlice";
@@ -17,7 +18,7 @@ import type { RootState } from "../app/store";
 
 const TimelineConfigCard: React.FC = () => {
   const dispatch = useDispatch();
-  const { characters } = useSelector(
+  const { characters, places } = useSelector(
     (state: RootState) => state[timelineSlice.reducerPath]
   ) as Timeline;
 
@@ -28,6 +29,7 @@ const TimelineConfigCard: React.FC = () => {
       startTime: "12:00",
       endTime: "23:00",
       characters: characters,
+      places: places,
     },
 
     validate: {},
@@ -95,14 +97,62 @@ const TimelineConfigCard: React.FC = () => {
         {/* 登場人物 */}
         {form.getValues().characters.map((c, index) => (
           <Group key={c.name} mt="xs">
+            <Text size="sm">{index + 1}.</Text>
             <TextInput
+              placeholder="キャラクター名"
               key={form.key(`characters.${index}.name`)}
               {...form.getInputProps(`characters.${index}.name`)}
             />
+            <TextInput
+              placeholder="プレイヤー名"
+              key={form.key(`characters.${index}.playerName`)}
+              {...form.getInputProps(`characters.${index}.playerName`)}
+            />
           </Group>
         ))}
+        <Group justify="flex-end" mt="md">
+          <Button
+            onClick={() =>
+              form.insertListItem("characters", {
+                name: "",
+                playerName: "",
+                memo: "",
+              } as Character)
+            }
+          >
+            キャラクター追加
+          </Button>
+        </Group>
 
         {/* 場所 */}
+        {form.getValues().places.map((p, index) => (
+          <Group key={p.name} mt="xs">
+            <Text size="sm">{index + 1}.</Text>
+            <TextInput
+              placeholder="場所名"
+              key={form.key(`places.${index}.name`)}
+              {...form.getInputProps(`places.${index}.name`)}
+            />
+            <TextInput
+              placeholder="メモ"
+              key={form.key(`places.${index}.memo`)}
+              {...form.getInputProps(`places.${index}.memo`)}
+            />
+          </Group>
+        ))}
+        <Group justify="flex-end" mt="md">
+          <Button
+            onClick={() =>
+              form.insertListItem("places", {
+                name: "",
+                playerName: "",
+                memo: "",
+              } as Character)
+            }
+          >
+            場所追加
+          </Button>
+        </Group>
 
         <Group justify="flex-end" mt="md">
           <Button type="submit">Submit</Button>
