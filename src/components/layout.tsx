@@ -1,13 +1,4 @@
-import {
-  ActionIcon,
-  AppShell,
-  Text,
-  Flex,
-  Grid,
-  TextInput,
-  Title,
-  Button,
-} from "@mantine/core";
+import { AppShell, Text, Grid, TextInput, Title, Button } from "@mantine/core";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import {
@@ -16,8 +7,9 @@ import {
 } from "../features/timelines/timelineSlice";
 import type { RootState } from "../app/store";
 import { useEffect, useState } from "react";
-import { useDebouncedValue } from "@mantine/hooks";
-import { IconAdjustments, IconSettings } from "@tabler/icons-react";
+import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
+import { IconAdjustments } from "@tabler/icons-react";
+import ConfigModal from "./ConfigModal";
 
 export const Layout = () => {
   const { scenario } = useSelector(
@@ -30,6 +22,9 @@ export const Layout = () => {
   useEffect(() => {
     dispatch(timelineSlice.actions.updateScenarioName(debounced));
   }, [debounced]);
+
+  // 設定モーダル
+  const [opened, { open, close }] = useDisclosure(false);
 
   return (
     <AppShell header={{ height: 40 }} padding="sm">
@@ -73,6 +68,7 @@ export const Layout = () => {
               color="dark"
               leftSection={<IconAdjustments />}
               variant="outline"
+              onClick={open}
             >
               シナリオ設定
             </Button>
@@ -81,6 +77,7 @@ export const Layout = () => {
       </AppShell.Header>
       <AppShell.Main>
         <Outlet />
+        <ConfigModal opened={opened} onClose={close} />
       </AppShell.Main>
     </AppShell>
   );

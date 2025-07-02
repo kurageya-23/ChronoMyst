@@ -1,126 +1,94 @@
-import type { PayloadAction } from "@reduxjs/toolkit";
+import { createSelector, type PayloadAction } from "@reduxjs/toolkit";
 import { createAppSlice } from "../../app/createAppSlice";
+import {
+  charactersSample,
+  placesSample,
+  type CalendarEvent,
+  type Character,
+  type Place,
+  type Scenario,
+  type Timeline,
+  type TimelineConfig,
+  type TimelineEvent,
+} from "../models";
+import type { RootState } from "../../app/store";
 
-// シナリオ
-export type Scenario = {
-  name: string;
-  memo: string;
+// 日付変換
+const today = new Date();
+const toToday = function (timeStr: string): string {
+  const [h, m] = timeStr.split(":").map((s) => Number(s));
+
+  return new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+    h,
+    m,
+    0,
+    0
+  ).toISOString();
 };
 
-// タイムライン
-export type Timeline = {
-  // シナリオ情報
-  scenario: Scenario;
-  // 時間（ex. 11:00）
-  times: string[];
-  // キャラクターリスト
-  characters: Character[];
-  // 場所
-  places: Place[];
-  // 出来事リスト
-  events: TimelineEvent[];
+/** タイムラインイベントからカレンダーイベントへの変換 */
+const timelineToCalendar = function (timeline: TimelineEvent) {
+  return {
+    id: generateCalendarEventId(timeline),
+    title: timeline.detail,
+    start: toToday(timeline.startTime),
+    end: timeline.endTime ? toToday(timeline.endTime) : timeline.endTime,
+    backgroundColor: timeline.color,
+    extendedProps: {
+      characters: timeline.characters,
+      place: timeline.place,
+    },
+  } as CalendarEvent;
 };
 
-// キャラクター
-export type Character = {
-  name: string;
-  playerName: string;
-  color: string;
-  memo: string;
+/** タイムラインイベントからカレンダーIDを生成 */
+const generateCalendarEventId = function (timeline: TimelineEvent): string {
+  return (
+    timeline.characters.map((c) => c.id).join(",") +
+    "|" +
+    new Date().toISOString()
+  );
 };
 
-// 場所
-export type Place = {
-  name: string;
-  color: string;
-  memo: string;
-};
-
-// 出来事
-export type TimelineEvent = {
-  startTime: string;
-  endTime?: string;
-  place: Place;
-  characters: Character[];
-  color: string;
-  detail: string;
-};
-
-// タイムライン設定
-export type TimelineConfig = {
-  interval: string;
-  startTime: string;
-  endTime: string;
-  characters: Character[];
-  places: Place[];
-};
-
+// Stateの初期化
 const initialTimeline: Timeline = {
   scenario: {
-    name: "とあるマーダーミステリー",
+    name: "無題",
     memo: "おもろそう",
   } as Scenario,
-  times: ["10:00", "10:30", "11:00", "11:30", "12:00", "12:30"],
-  characters: [
-    {
-      name: "キャラクターA",
-      playerName: "プレイヤーA",
-      memo: "つよそう",
-    } as Character,
-    {
-      name: "キャラクターB",
-      playerName: "プレイヤーB",
-      memo: "よわそう",
-    } as Character,
-    {
-      name: "キャラクターC",
-      playerName: "プレイヤーC",
-      memo: "かわいい",
-    } as Character,
-  ],
-  places: [
-    { name: "エントランス", memo: "" } as Place,
-    { name: "Aの部屋", memo: "" } as Place,
-    { name: "倉庫", memo: "" } as Place,
-  ],
-  events: [
-    {
-      startTime: "10:00",
-      place: { name: "エントランス", memo: "広い" },
+  calendarEvents: [
+    timelineToCalendar({
+      startTime: "22:00",
+      endTime: "23:00",
+      detail: "AとBが談笑していた",
       characters: [
         {
+          id: 1,
           name: "キャラクターA",
           playerName: "プレイヤーA",
           memo: "つよそう",
         } as Character,
         {
+          id: 2,
           name: "キャラクターB",
           playerName: "プレイヤーB",
           memo: "よわそう",
         } as Character,
       ],
-      detail: "A,Bが会ってた",
-    } as TimelineEvent,
-    {
-      startTime: "11:00",
-      endTime: "12:00",
-      place: { name: "Aの部屋", memo: "狭い" },
-      characters: [
-        {
-          name: "キャラクターC",
-          playerName: "プレイヤーC",
-          memo: "かわいい",
-        } as Character,
-      ],
-      detail: "Cがひとり",
-    } as TimelineEvent,
-    {
-      startTime: "11:30",
-      place: { name: "倉庫", memo: "散らかっている" },
-      detail: "謎の音",
-      color: "red",
-    } as TimelineEvent,
+      place: { id: 1, name: "エントランス", memo: "" } as Place,
+      color: "#868e96",
+    } as TimelineEvent),
   ],
+  config: {
+    interval: "01:00",
+    startTime: "18:00",
+    endTime: "23:00",
+    characters: charactersSample,
+    places: placesSample,
+  } as TimelineConfig,
 };
 
 export const timelineSlice = createAppSlice({
@@ -130,50 +98,22 @@ export const timelineSlice = createAppSlice({
     save: create.reducer((_state, action: PayloadAction<Timeline>) => {
       return action.payload;
     }),
+    /** シナリオ名更新 */
     updateScenarioName: create.reducer(
       (state, action: PayloadAction<string>) => {
         state.scenario.name = action.payload;
       }
     ),
+    /** 設定更新 */
     updateConfig: create.reducer(
       (state, action: PayloadAction<TimelineConfig>) => {
-        const { startTime, endTime, interval } = action.payload;
-
-        // "HH:mm" → 分数に変換
-        const toMinutes = (hm: string) => {
-          const [h, m] = hm.split(":").map(Number);
-          return h * 60 + m;
-        };
-
-        // 分数 → "HH:mm" フォーマットに変換
-        const toHmString = (min: number) => {
-          const h = Math.floor(min / 60);
-          const m = min % 60;
-          return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-        };
-
-        const start = toMinutes(startTime);
-        const end = toMinutes(endTime);
-        const step = toMinutes(interval);
-
-        // 範囲チェック
-        if (step <= 0 || end < start) {
-          // 異常値は無視 or 既存の state.times をそのまま返す
-          return;
-        }
-
-        // 新しい times 配列を生成
-        const newTimes: string[] = [];
-        for (let t = start; t <= end; t += step) {
-          newTimes.push(toHmString(t));
-        }
-
-        state.times = newTimes;
-
-        // キャラクター、プレイヤー、場所
-        const { characters, places } = action.payload;
-        state.characters = characters;
-        state.places = places;
+        state.config = action.payload;
+      }
+    ),
+    /** イベント登録 */
+    createTimelineEvent: create.reducer(
+      (state, action: PayloadAction<TimelineEvent>) => {
+        state.calendarEvents.push(timelineToCalendar(action.payload));
       }
     ),
   }),
@@ -181,3 +121,29 @@ export const timelineSlice = createAppSlice({
     selectTimeline: (timeline) => timeline,
   },
 });
+
+/** 開始時間と終了時間と間隔から時間の選択肢を生成 */
+export const selectTimes = createSelector(
+  (state: RootState) => state[timelineSlice.reducerPath].config,
+  (config) => {
+    const toMinutes = (hm: string) => {
+      const [h, m] = hm.split(":").map(Number);
+      return h * 60 + m;
+    };
+    const toHmString = (min: number) => {
+      const h = Math.floor(min / 60);
+      const m = min % 60;
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    };
+
+    const start = toMinutes(config.startTime);
+    const end = toMinutes(config.endTime);
+    const step = toMinutes(config.interval);
+
+    const arr: string[] = [];
+    for (let t = start; t <= end; t += step) {
+      arr.push(toHmString(t));
+    }
+    return arr;
+  }
+);
