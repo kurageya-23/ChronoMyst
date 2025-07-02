@@ -1,0 +1,15 @@
+.axis-only .fc-timegrid-cols {
+  display: none !important;
+}
+
+.axis-only .fc-scrollgrid-sync-table {
+  width: 0 !important;
+}
+
+.axis-only .fc-timegrid-body > table {
+  width: 0 !important;
+}
+
+.axis-only .fc-timegrid-slot-lane {
+  display: none !important;
+}
