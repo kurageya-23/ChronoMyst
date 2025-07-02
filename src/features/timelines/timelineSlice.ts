@@ -36,6 +36,7 @@ const timelineToCalendar = function (timeline: TimelineEvent) {
     title: timeline.detail,
     start: toToday(timeline.startTime),
     end: timeline.endTime ? toToday(timeline.endTime) : timeline.endTime,
+    borderColor: timeline.color,
     backgroundColor: timeline.color,
     extendedProps: {
       characters: timeline.characters,

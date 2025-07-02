@@ -91,6 +91,7 @@ export const charactersSample = [
     name: "キャラクターA",
     playerName: "プレイヤーA",
     memo: "つよそう",
+    color: "#ffffff"
   } as Character,
   {
     id: 2,

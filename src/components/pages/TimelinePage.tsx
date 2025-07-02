@@ -28,7 +28,15 @@ function TimelinePage() {
         {config.characters.map((c) => (
           <Grid.Col span="auto" flex="center" pt={0} px={0} key={c.id}>
             <Group justify="center">
-              <Text>{c.name}</Text>
+              <Text
+                style={{
+                  textDecoration: "underline",
+                  textDecorationColor: c.color,
+                  textDecorationThickness: "2px",
+                }}
+              >
+                {c.name}
+              </Text>
             </Group>
             <Group justify="center">
               <Text size="xs" color="dimmed">
