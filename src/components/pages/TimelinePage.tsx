@@ -20,6 +20,11 @@ function TimelinePage() {
   ) as Timeline;
 
   const [opened, { open, close }] = useDisclosure(false);
+  const handleClose = () => {
+    close();
+    setSelectedEvent(null);
+  };
+
   const [selectedEvent, setSelectedEvent] = useState<EventApi | null>(null);
 
   return (
@@ -123,7 +128,7 @@ function TimelinePage() {
       </Affix>
       <EditEventModal
         opened={opened}
-        onClose={close}
+        onClose={handleClose}
         selectedEvent={selectedEvent}
       />
     </>

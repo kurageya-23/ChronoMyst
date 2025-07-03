@@ -22,18 +22,6 @@ export type Place = {
 };
 
 // TODO: 出来事
-// export type TimelineEvent = {
-//   startTime: string;
-//   endTime?: string;
-//   placeId: string;
-//   place: Place;
-//   characterIds: string[];
-//   characters: Character[];
-//   color: string;
-//   detail: string;
-// };
-
-// TODO: 出来事
 export type CalendarEvent = {
   id: string;
   gourpId: string;
@@ -91,19 +79,21 @@ export const charactersSample = [
     name: "キャラクターA",
     playerName: "プレイヤーA",
     memo: "つよそう",
-    color: "#ffffff"
+    color: "#fa5252"
   } as Character,
   {
     id: 2,
     name: "キャラクターB",
     playerName: "プレイヤーB",
     memo: "よわそう",
+    color: "#fa5252"
   } as Character,
   {
     id: 3,
     name: "キャラクターC",
     playerName: "プレイヤーC",
     memo: "かわいい",
+    color: "#fa5252"
   } as Character,
 ];
 

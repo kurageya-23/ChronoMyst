@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import {
   Button,
   Container,
@@ -27,9 +27,11 @@ import type {
 } from "../features/models";
 import { COLOR_SET } from "../app/appConstants";
 import { type EventApi } from "@fullcalendar/core";
+import { v4 as uuidv4 } from "uuid";
 
 /** イベント登録専用データ定義 */
 type FormEvent = {
+  id: string;
   startTime: string;
   endTime?: string;
   placeId: string;
@@ -56,13 +58,6 @@ const toToday = function (timeStr: string): string {
   ).toISOString();
 };
 
-/** フォームデータからカレンダーIDを生成 */
-const generateCalendarEventId = function (ev: FormEvent): string {
-  return (
-    ev.characters.map((c) => c.id).join(",") + "|" + new Date().toISOString()
-  );
-};
-
 /** カレンダーイベントからフォームデータへの変換 */
 const calendarToForm = (event: EventApi): FormEvent => {
   /** ISO文字列 → "HH:mm" に変換 */
@@ -74,6 +69,7 @@ const calendarToForm = (event: EventApi): FormEvent => {
   };
 
   return {
+    id: event.id,
     startTime: event.start ? isoToTimeString(event.startStr) : "",
     endTime: event.end ? isoToTimeString(event.endStr) : "",
     detail: event.title,
@@ -90,7 +86,7 @@ const calendarToForm = (event: EventApi): FormEvent => {
 /** フォームイベントからカレンダーイベントへの変換 */
 const formToCalendar = function (form: FormEvent) {
   return {
-    id: generateCalendarEventId(form),
+    id: form.id,
     title: form.detail,
     start: toToday(form.startTime),
     end: form.endTime ? toToday(form.endTime) : "",
@@ -120,66 +116,50 @@ export default function EditEventModal({
       withinPortal
       title="イベントの登録"
       styles={{
-        header: {
-          height: 20,
-          paddingTop: 4,
-          paddingBottom: 4,
-          // TODO: タイトル行の高さを揃える
-          "& .mantine-Modal-title": {
-            lineHeight: 1,
-            fontSize: "1rem",
-          },
-          // TODO: クローズボタンのサイズを調整
-          '& button[aria-label="Close modal"]': {
-            padding: 4,
-          },
-        },
-
         body: {
           backgroundColor: "#fafafa",
         },
       }}
     >
-      <ModalContent onClose={onClose} selectedEvent={selectedEvent} />
+      <ModalContent
+        opened={opened}
+        onClose={onClose}
+        selectedEvent={selectedEvent}
+      />
     </Modal>
   );
 }
 
-type ModalContentProps = {
-  onClose: () => void;
-  selectedEvent: EventApi | null;
-};
 /** モーダルのメインコンテンツ */
-const ModalContent: React.FC<ModalContentProps> = ({
+const ModalContent: React.FC<EditEventModalProps> = ({
+  opened,
   onClose,
   selectedEvent,
 }) => {
-  const selected = selectedEvent ? calendarToForm(selectedEvent) : undefined;
-
   const dispatch = useDispatch();
   const { config } = useSelector(
     (s: RootState) => s[timelineSlice.reducerPath]
   ) as Timeline;
   const times = useSelector(selectTimes);
 
-  // 初期フォーム値
-  const initialValues = useMemo<FormEvent>(
-    () => ({
-      startTime: selected?.startTime ?? "",
-      endTime: selected?.endTime ?? "",
-      detail: selected?.detail ?? "",
-      characterIds: selected?.characterIds ?? [],
-      characters: selected?.characters ?? [],
-      placeId: selected?.placeId ?? "",
-      place: selected?.place ?? ({} as Place),
-      color: selected?.color ?? "#868e96",
-    }),
-    []
-  );
+  // フォームデータ
+  const form = useForm<FormEvent>({
+    mode: "controlled",
+    initialValues: getInitialValues(selectedEvent),
+  });
 
-  const form = useForm<FormEvent>({ mode: "controlled", initialValues });
+  // モーダルの開閉検知フック
+  useEffect(() => {
+    if (!opened) {
+      // モーダルが閉じたらフォームを初期化
+      form.reset();
+    } else {
+      // モーダルが開いたら、selectedEvent に合わせて初期値をリセット
+      form.setValues(getInitialValues(selectedEvent));
+    }
+  }, [opened, selectedEvent]);
 
-  // 送信前のマッピング
+  // データストア送信前のマッピング
   const buildEventPayload = (values: FormEvent): FormEvent => {
     const characters = values.characterIds
       .map((id) => config.characters.find((c) => String(c.id) === id)!)
@@ -188,10 +168,25 @@ const ModalContent: React.FC<ModalContentProps> = ({
     return { ...values, characters, place };
   };
 
-  /** イベントデータの登録 */
+  /** イベントデータの登録・更新 */
   const handleSubmit = (values: FormEvent) => {
     const payload = formToCalendar(buildEventPayload(values));
-    dispatch(timelineSlice.actions.createTimelineEvent(payload));
+    if (selectedEvent) {
+      // 更新
+      dispatch(timelineSlice.actions.updateTimelineEvent(payload));
+    } else {
+      // 新規
+      payload.id = uuidv4();
+      dispatch(timelineSlice.actions.createTimelineEvent(payload));
+    }
+    onClose();
+  };
+
+  /** イベントデータの削除 */
+  const handleDelete = () => {
+    if (window.confirm("本当にこのイベントを削除しますか？")) {
+      dispatch(timelineSlice.actions.deleteTimelineEvent(form.values.id));
+    }
     onClose();
   };
 
@@ -199,6 +194,13 @@ const ModalContent: React.FC<ModalContentProps> = ({
     <Container my="lg">
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap={4}>
+          {selectedEvent ? (
+            <Text size="xs" color="dimmed">
+              ID: {selectedEvent?.id}
+            </Text>
+          ) : (
+            <></>
+          )}
           <TimeRangePicker times={times} form={form} />
           <TextareaInput form={form} />
           <ListChipSelector
@@ -229,16 +231,45 @@ const ModalContent: React.FC<ModalContentProps> = ({
             disallowInput
             {...form.getInputProps("color")}
           />
-          <Group justify="flex-end" mt="md">
-            <Button type="submit" color="teal">
-              登録
-            </Button>
-          </Group>
+          {selectedEvent ? (
+            <Group justify="space-between" mt="md">
+              <Button color="red" onClick={handleDelete}>
+                削除
+              </Button>
+              <Button type="submit" color="indigo">
+                更新
+              </Button>
+            </Group>
+          ) : (
+            <Group justify="flex-end" mt="md">
+              <Button type="submit" color="teal">
+                登録
+              </Button>
+            </Group>
+          )}
         </Stack>
       </form>
     </Container>
   );
 };
+
+// 初期値取得ユーティリティ
+function getInitialValues(event: EventApi | null): FormEvent {
+  if (!event) {
+    return {
+      id: "",
+      startTime: "",
+      endTime: "",
+      detail: "",
+      characterIds: [],
+      characters: [],
+      placeId: "",
+      place: {} as Place,
+      color: "#868e96",
+    };
+  }
+  return calendarToForm(event);
+}
 
 // コンポーネント分割
 type TimeRangePickerProps = {

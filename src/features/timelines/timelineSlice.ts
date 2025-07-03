@@ -36,19 +36,61 @@ export const timelineSlice = createAppSlice({
     /** シナリオ名更新 */
     updateScenarioName: create.reducer(
       (state, action: PayloadAction<string>) => {
+        console.debug("[reducer] updateScenarioName start.", action.payload);
         state.scenario.name = action.payload;
+        console.debug("[reducer] updateScenarioName end.");
       }
     ),
     /** 設定更新 */
     updateConfig: create.reducer(
       (state, action: PayloadAction<TimelineConfig>) => {
+        console.debug("[reducer] updateConfig start.", action.payload);
         state.config = action.payload;
+        console.debug("[reducer] updateConfig end.");
       }
     ),
     /** イベント登録 */
     createTimelineEvent: create.reducer(
       (state, action: PayloadAction<CalendarEvent>) => {
+        console.debug("[reducer] createTilelineEvent start.", action.payload);
         state.calendarEvents.push(action.payload);
+        console.debug("[reducer] createTilelineEvent end.");
+      }
+    ),
+    /** イベント更新 */
+    updateTimelineEvent: create.reducer(
+      (state, action: PayloadAction<CalendarEvent>) => {
+        console.debug("[reducer] updateTilelineEvent start.", action.payload);
+        const updated = action.payload;
+        const event = state.calendarEvents.find((ev) => ev.id === updated.id);
+        if (event) {
+          Object.assign(event, updated);
+          console.debug(
+            `[reducer] updateTilelineEvent updated.(${updated.id})`
+          );
+        } else {
+          console.error(
+            `[reducer] updateTilelineEvent id not found.(${updated.id})`
+          );
+        }
+        console.debug(
+          "[reducer] updateTilelineEvent end.",
+          state.calendarEvents
+        );
+      }
+    ),
+    /** イベント削除 */
+    deleteTimelineEvent: create.reducer(
+      (state, action: PayloadAction<string>) => {
+        console.debug("[reducer] deleteTimelineEvent start.", action.payload);
+        // id をキーに該当イベントを除外
+        state.calendarEvents = state.calendarEvents.filter(
+          (ev) => ev.id !== action.payload
+        );
+        console.debug(
+          "[reducer] deleteTimelineEvent end.",
+          state.calendarEvents
+        );
       }
     ),
   }),

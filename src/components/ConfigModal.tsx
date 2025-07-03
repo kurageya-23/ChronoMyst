@@ -43,21 +43,6 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => (
     withinPortal
     title="設定"
     styles={{
-      header: {
-        height: 20,
-        paddingTop: 4,
-        paddingBottom: 4,
-        // タイトル行の高さを揃える
-        "& .mantine-Modal-title": {
-          lineHeight: 1,
-          fontSize: "1rem",
-        },
-        // クローズボタンのサイズを調整
-        '& button[aria-label="Close modal"]': {
-          padding: 4,
-        },
-      },
-
       body: {
         backgroundColor: "#fafafa",
       },
