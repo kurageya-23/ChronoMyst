@@ -4,6 +4,7 @@ import { useDisclosure } from "@mantine/hooks";
 import EditEventModal from "../EditEventModal";
 
 import FullCalendar from "@fullcalendar/react";
+import { type EventApi } from "@fullcalendar/core";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useSelector } from "react-redux";
 import { timelineSlice } from "../../features/timelines/timelineSlice";
@@ -11,14 +12,15 @@ import type { RootState } from "../../app/store";
 import "./TimelinePage.css";
 import type { Timeline } from "../../features/models";
 import CustomCalendarEvent from "../CustomCalendarEvent";
+import { useState } from "react";
 
 function TimelinePage() {
   const { calendarEvents, config } = useSelector(
     (state: RootState) => state[timelineSlice.reducerPath]
   ) as Timeline;
 
-  // イベント登録モーダル
   const [opened, { open, close }] = useDisclosure(false);
+  const [selectedEvent, setSelectedEvent] = useState<EventApi | null>(null);
 
   return (
     <>
@@ -100,6 +102,11 @@ function TimelinePage() {
                 scrollTime={config.startTime}
                 eventContent={CustomCalendarEvent}
                 events={filteredEvents}
+                eventClick={(info) => {
+                  info.jsEvent.preventDefault();
+                  setSelectedEvent(info.event);
+                  open();
+                }}
               />
             </Grid.Col>
           );
@@ -114,7 +121,11 @@ function TimelinePage() {
           </ActionIcon>
         </Group>
       </Affix>
-      <EditEventModal opened={opened} onClose={close} />
+      <EditEventModal
+        opened={opened}
+        onClose={close}
+        selectedEvent={selectedEvent}
+      />
     </>
   );
 }

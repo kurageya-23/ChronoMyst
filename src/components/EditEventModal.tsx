@@ -19,17 +19,97 @@ import {
   selectTimes,
   timelineSlice,
 } from "../features/timelines/timelineSlice";
-import type { Place, Timeline, TimelineEvent } from "../features/models";
+import type {
+  CalendarEvent,
+  Character,
+  Place,
+  Timeline,
+} from "../features/models";
 import { COLOR_SET } from "../app/appConstants";
+import { type EventApi } from "@fullcalendar/core";
+
+/** イベント登録専用データ定義 */
+type FormEvent = {
+  startTime: string;
+  endTime?: string;
+  placeId: string;
+  place: Place;
+  characterIds: string[];
+  characters: Character[];
+  color: string;
+  detail: string;
+};
+
+/** イベントを今日日付に変換 */
+const toToday = function (timeStr: string): string {
+  const today = new Date();
+  const [h, m] = timeStr.split(":").map((s) => Number(s));
+
+  return new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+    h,
+    m,
+    0,
+    0
+  ).toISOString();
+};
+
+/** フォームデータからカレンダーIDを生成 */
+const generateCalendarEventId = function (ev: FormEvent): string {
+  return (
+    ev.characters.map((c) => c.id).join(",") + "|" + new Date().toISOString()
+  );
+};
+
+/** カレンダーイベントからフォームデータへの変換 */
+const calendarToForm = (event: EventApi): FormEvent => {
+  /** ISO文字列 → "HH:mm" に変換 */
+  const isoToTimeString = (iso: string): string => {
+    const d = new Date(iso);
+    const hh = d.getHours().toString().padStart(2, "0");
+    const mm = d.getMinutes().toString().padStart(2, "0");
+    return `${hh}:${mm}`;
+  };
+
+  return {
+    startTime: event.start ? isoToTimeString(event.startStr) : "",
+    endTime: event.end ? isoToTimeString(event.endStr) : "",
+    detail: event.title,
+    color: event.backgroundColor,
+    characters: event.extendedProps.characters ?? [],
+    characterIds: (event.extendedProps.characters ?? []).map((c: Character) =>
+      String(c.id)
+    ),
+    place: event.extendedProps.place ?? ({} as Place),
+    placeId: String(event.extendedProps.place?.id ?? ""),
+  };
+};
+
+/** フォームイベントからカレンダーイベントへの変換 */
+const formToCalendar = function (form: FormEvent) {
+  return {
+    id: generateCalendarEventId(form),
+    title: form.detail,
+    start: toToday(form.startTime),
+    end: form.endTime ? toToday(form.endTime) : "",
+    borderColor: form.color,
+    backgroundColor: form.color,
+    extendedProps: { characters: form.characters, place: form.place },
+  } as CalendarEvent;
+};
 
 export type EditEventModalProps = {
   opened: boolean;
   onClose: () => void;
+  selectedEvent: EventApi | null;
 };
-
+/** イベント登録・編集モーダル */
 export default function EditEventModal({
   opened,
   onClose,
+  selectedEvent,
 }: EditEventModalProps) {
   return (
     <Modal
@@ -44,12 +124,12 @@ export default function EditEventModal({
           height: 20,
           paddingTop: 4,
           paddingBottom: 4,
-          // タイトル行の高さを揃える
+          // TODO: タイトル行の高さを揃える
           "& .mantine-Modal-title": {
             lineHeight: 1,
             fontSize: "1rem",
           },
-          // クローズボタンのサイズを調整
+          // TODO: クローズボタンのサイズを調整
           '& button[aria-label="Close modal"]': {
             padding: 4,
           },
@@ -60,14 +140,22 @@ export default function EditEventModal({
         },
       }}
     >
-      <ModalContent onClose={onClose} />
+      <ModalContent onClose={onClose} selectedEvent={selectedEvent} />
     </Modal>
   );
 }
 
-type ModalContentProps = { onClose: () => void };
+type ModalContentProps = {
+  onClose: () => void;
+  selectedEvent: EventApi | null;
+};
+/** モーダルのメインコンテンツ */
+const ModalContent: React.FC<ModalContentProps> = ({
+  onClose,
+  selectedEvent,
+}) => {
+  const selected = selectedEvent ? calendarToForm(selectedEvent) : undefined;
 
-const ModalContent: React.FC<ModalContentProps> = ({ onClose }) => {
   const dispatch = useDispatch();
   const { config } = useSelector(
     (s: RootState) => s[timelineSlice.reducerPath]
@@ -75,24 +163,24 @@ const ModalContent: React.FC<ModalContentProps> = ({ onClose }) => {
   const times = useSelector(selectTimes);
 
   // 初期フォーム値
-  const initialValues = useMemo<TimelineEvent>(
+  const initialValues = useMemo<FormEvent>(
     () => ({
-      startTime: "",
-      endTime: "",
-      detail: "",
-      characterIds: [],
-      characters: [],
-      placeId: "",
-      place: {} as Place,
-      color: "#868e96",
+      startTime: selected?.startTime ?? "",
+      endTime: selected?.endTime ?? "",
+      detail: selected?.detail ?? "",
+      characterIds: selected?.characterIds ?? [],
+      characters: selected?.characters ?? [],
+      placeId: selected?.placeId ?? "",
+      place: selected?.place ?? ({} as Place),
+      color: selected?.color ?? "#868e96",
     }),
     []
   );
 
-  const form = useForm<TimelineEvent>({ mode: "controlled", initialValues });
+  const form = useForm<FormEvent>({ mode: "controlled", initialValues });
 
   // 送信前のマッピング
-  const buildEventPayload = (values: TimelineEvent): TimelineEvent => {
+  const buildEventPayload = (values: FormEvent): FormEvent => {
     const characters = values.characterIds
       .map((id) => config.characters.find((c) => String(c.id) === id)!)
       .filter(Boolean);
@@ -100,8 +188,9 @@ const ModalContent: React.FC<ModalContentProps> = ({ onClose }) => {
     return { ...values, characters, place };
   };
 
-  const handleSubmit = (values: TimelineEvent) => {
-    const payload = buildEventPayload(values);
+  /** イベントデータの登録 */
+  const handleSubmit = (values: FormEvent) => {
+    const payload = formToCalendar(buildEventPayload(values));
     dispatch(timelineSlice.actions.createTimelineEvent(payload));
     onClose();
   };
@@ -154,7 +243,7 @@ const ModalContent: React.FC<ModalContentProps> = ({ onClose }) => {
 // コンポーネント分割
 type TimeRangePickerProps = {
   times: string[];
-  form: ReturnType<typeof useForm<TimelineEvent>>;
+  form: ReturnType<typeof useForm<FormEvent>>;
 };
 
 /** 時間選択 */
@@ -186,7 +275,7 @@ const TimeRangePicker: React.FC<TimeRangePickerProps> = ({ times, form }) => (
 
 /** メモ */
 const TextareaInput: React.FC<{
-  form: ReturnType<typeof useForm<TimelineEvent>>;
+  form: ReturnType<typeof useForm<FormEvent>>;
 }> = ({ form }) => <Textarea label="メモ" {...form.getInputProps("detail")} />;
 
 /** Chip選択 */

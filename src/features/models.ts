@@ -22,16 +22,16 @@ export type Place = {
 };
 
 // TODO: 出来事
-export type TimelineEvent = {
-  startTime: string;
-  endTime?: string;
-  placeId: string;
-  place: Place;
-  characterIds: string[];
-  characters: Character[];
-  color: string;
-  detail: string;
-};
+// export type TimelineEvent = {
+//   startTime: string;
+//   endTime?: string;
+//   placeId: string;
+//   place: Place;
+//   characterIds: string[];
+//   characters: Character[];
+//   color: string;
+//   detail: string;
+// };
 
 // TODO: 出来事
 export type CalendarEvent = {
