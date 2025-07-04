@@ -1,5 +1,4 @@
 /** FullCalendarイベントのカスタムコンポーネント */
-
 import { Badge, Stack, Group, Text } from "@mantine/core";
 import type { ExtendedCalenderEventProp } from "../features/models";
 import { IconMapPin } from "@tabler/icons-react";

@@ -1,12 +1,4 @@
-import {
-  AppShell,
-  Text,
-  Grid,
-  TextInput,
-  Title,
-  Button,
-  rgba,
-} from "@mantine/core";
+import { AppShell, Text, Grid, TextInput, Title, Button } from "@mantine/core";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { timelineSlice } from "../../features/timelines/timelineSlice";
