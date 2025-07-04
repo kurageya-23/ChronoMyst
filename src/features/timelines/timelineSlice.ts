@@ -3,7 +3,7 @@ import { createAppSlice } from "../../app/createAppSlice";
 import {
   charactersSample,
   placesSample,
-  type CalendarEvent,
+  type TimelineEvent,
   type Scenario,
   type Timeline,
   type TimelineConfig,
@@ -16,7 +16,7 @@ const initialTimeline: Timeline = {
     name: "無題",
     memo: "おもろそう",
   } as Scenario,
-  calendarEvents: [],
+  timelineEvents: [],
   config: {
     interval: "01:00",
     startTime: "18:00",
@@ -51,18 +51,18 @@ export const timelineSlice = createAppSlice({
     ),
     /** イベント登録 */
     createTimelineEvent: create.reducer(
-      (state, action: PayloadAction<CalendarEvent>) => {
+      (state, action: PayloadAction<TimelineEvent>) => {
         console.debug("[reducer] createTilelineEvent start.", action.payload);
-        state.calendarEvents.push(action.payload);
+        state.timelineEvents.push(action.payload);
         console.debug("[reducer] createTilelineEvent end.");
       }
     ),
     /** イベント更新 */
     updateTimelineEvent: create.reducer(
-      (state, action: PayloadAction<CalendarEvent>) => {
+      (state, action: PayloadAction<TimelineEvent>) => {
         console.debug("[reducer] updateTilelineEvent start.", action.payload);
         const updated = action.payload;
-        const event = state.calendarEvents.find((ev) => ev.id === updated.id);
+        const event = state.timelineEvents.find((ev) => ev.id === updated.id);
         if (event) {
           Object.assign(event, updated);
           console.debug(
@@ -75,7 +75,7 @@ export const timelineSlice = createAppSlice({
         }
         console.debug(
           "[reducer] updateTilelineEvent end.",
-          state.calendarEvents
+          state.timelineEvents
         );
       }
     ),
@@ -84,12 +84,12 @@ export const timelineSlice = createAppSlice({
       (state, action: PayloadAction<string>) => {
         console.debug("[reducer] deleteTimelineEvent start.", action.payload);
         // id をキーに該当イベントを除外
-        state.calendarEvents = state.calendarEvents.filter(
+        state.timelineEvents = state.timelineEvents.filter(
           (ev) => ev.id !== action.payload
         );
         console.debug(
           "[reducer] deleteTimelineEvent end.",
-          state.calendarEvents
+          state.timelineEvents
         );
       }
     ),

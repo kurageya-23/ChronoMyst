@@ -1,13 +1,13 @@
 import { AppShell, Text, Grid, TextInput, Title, Button } from "@mantine/core";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
-import { timelineSlice } from "../features/timelines/timelineSlice";
-import type { RootState } from "../app/store";
+import { timelineSlice } from "../../features/timelines/timelineSlice";
+import type { RootState } from "../../app/store";
 import { useEffect, useState } from "react";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { IconAdjustments } from "@tabler/icons-react";
-import ConfigModal from "./ConfigModal";
-import type { Timeline } from "../features/models";
+import ConfigModal from "../pages/timeline/configModal";
+import type { Timeline } from "../../features/models";
 
 export const Layout = () => {
   const { scenario } = useSelector(

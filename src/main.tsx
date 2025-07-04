@@ -11,11 +11,6 @@ import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
 import { MantineProvider } from "@mantine/core";
 
-// FullCalendar
-// import '@fullcalendar/common/main.css'
-// import '@fullcalendar/daygrid/main.css'
-// import '@fullcalendar/timegrid/main.css'
-
 // Redux
 import { Provider } from "react-redux";
 import { store } from "./app/store"

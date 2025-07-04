@@ -1,8 +1,8 @@
 import { createBrowserRouter } from "react-router-dom";
-import { Layout } from "../components/layout";
+import { Layout } from "../components/layout/layout";
+import TimelinePage from "../components/pages/timeline";
 
 // 各ページコンポーネントをimport
-import TimelinePage from "../components/pages/TimelinePage";
 
 const router = createBrowserRouter([
   {

@@ -5,7 +5,7 @@ import type { ExtendedCalenderEventProp } from "../features/models";
 import { IconMapPin } from "@tabler/icons-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-const CustomCalendarEvent = (eventInfo: any) => {
+const CustomTimelineEvent = (eventInfo: any) => {
   const { timeText, event } = eventInfo;
   const extendProps = event.extendedProps as ExtendedCalenderEventProp;
 
@@ -36,4 +36,4 @@ const CustomCalendarEvent = (eventInfo: any) => {
   );
 };
 
-export default CustomCalendarEvent;
+export default CustomTimelineEvent;
