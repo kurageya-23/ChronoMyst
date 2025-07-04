@@ -13,12 +13,12 @@ import { MantineProvider } from "@mantine/core";
 
 // Redux
 import { Provider } from "react-redux";
-import { store } from "./app/store"
+import { store } from "./app/store";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
     <Provider store={store}>
-      <MantineProvider>
+      <MantineProvider defaultColorScheme="dark">
         <RouterProvider router={router} />
       </MantineProvider>
     </Provider>

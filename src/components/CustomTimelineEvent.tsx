@@ -1,5 +1,4 @@
 /** FullCalendarイベントのカスタムコンポーネント */
-
 import { Badge, Stack, Group, Text } from "@mantine/core";
 import type { ExtendedCalenderEventProp } from "../features/models";
 import { IconMapPin } from "@tabler/icons-react";
@@ -31,7 +30,9 @@ const CustomTimelineEvent = (eventInfo: any) => {
           </Badge>
         )}
       </Group>
-      <Text size="12px">{event.title}</Text>
+      <Text size="14px" style={{ fontWeight: "bold" }}>
+        {event.title}
+      </Text>
     </Stack>
   );
 };

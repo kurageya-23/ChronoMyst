@@ -42,11 +42,6 @@ export default function EditTimelineEventModal({
       size="100%"
       withinPortal
       title="イベントの登録"
-      styles={{
-        body: {
-          backgroundColor: "#fafafa",
-        },
-      }}
     >
       <ModalContent
         opened={opened}
@@ -70,8 +65,11 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
   const times = useSelector(selectTimes);
 
   // カスタムフックからロジックを取得
-  const { initialValues, buildPayload, finalizeTimelineEvent: finalizeTimelineEvent } =
-    useTimelineEvent(selectedEvent, config);
+  const {
+    initialValues,
+    buildPayload,
+    finalizeTimelineEvent: finalizeTimelineEvent,
+  } = useTimelineEvent(selectedEvent, config);
 
   // フォームデータ
   const form = useForm({

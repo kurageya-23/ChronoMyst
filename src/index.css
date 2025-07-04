@@ -11,6 +11,9 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+
+  /* FullCalendarの今日の色を透明化 */
+  --fc-today-bg-color: transparent !important;
 }
 
 a {
@@ -26,6 +29,8 @@ body {
   margin: 0;
   min-width: 320px;
   min-height: 100vh;
+  /* background-color: #242424;
+  color: rgba(255, 255, 255, 0.87); */
 }
 
 h1 {

@@ -25,15 +25,7 @@ export const Layout = () => {
   const [opened, { open, close }] = useDisclosure(false);
 
   return (
-    <AppShell
-      header={{ height: 40 }}
-      padding="sm"
-      styles={{
-        main: {
-          backgroundColor: "#fdfdfd",
-        },
-      }}
-    >
+    <AppShell header={{ height: 40 }} padding="sm">
       {/* ヘッダーメニュー */}
       <AppShell.Header>
         <Grid h="100%" justify="space-between" align="center" px="lg">
@@ -71,7 +63,7 @@ export const Layout = () => {
             {/* シナリオ設定ボタン */}
             <Button
               size="xs"
-              color="dark"
+              color="white"
               leftSection={<IconAdjustments />}
               variant="outline"
               onClick={open}
