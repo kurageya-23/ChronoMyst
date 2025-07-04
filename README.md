@@ -147,3 +147,14 @@ localhostと表記されたURLが出たら起動成功です。
   ➜  Network: use --host to expose
   ➜  press h + enter to show help
 ```
+
+## ブランチ運用
+
+- main
+デプロイして運用しているバージョンになります。  
+直接push不可（制限かけてる...はず）  
+- develop
+mainにマージする前のシステムテストバージョンです。  
+- feature/[機能名(自己判断でつけてOK)]
+機能開発ブランチです。  
+developからブランチ作成し、一通り動作確認したらdevelopにマージしてもらってOKです。  
