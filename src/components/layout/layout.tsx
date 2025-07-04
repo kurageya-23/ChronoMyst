@@ -1,15 +1,13 @@
 import { AppShell, Text, Grid, TextInput, Title, Button } from "@mantine/core";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
-import {
-  timelineSlice,
-  type Timeline,
-} from "../features/timelines/timelineSlice";
-import type { RootState } from "../app/store";
+import { timelineSlice } from "../../features/timelines/timelineSlice";
+import type { RootState } from "../../app/store";
 import { useEffect, useState } from "react";
 import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
 import { IconAdjustments } from "@tabler/icons-react";
-import ConfigModal from "./ConfigModal";
+import ConfigModal from "../pages/timeline/configModal";
+import type { Timeline } from "../../features/models";
 
 export const Layout = () => {
   const { scenario } = useSelector(
@@ -21,13 +19,21 @@ export const Layout = () => {
   const dispatch = useDispatch();
   useEffect(() => {
     dispatch(timelineSlice.actions.updateScenarioName(debounced));
-  }, [debounced]);
+  }, [debounced, dispatch]);
 
   // 設定モーダル
   const [opened, { open, close }] = useDisclosure(false);
 
   return (
-    <AppShell header={{ height: 40 }} padding="sm">
+    <AppShell
+      header={{ height: 40 }}
+      padding="sm"
+      styles={{
+        main: {
+          backgroundColor: "#fdfdfd",
+        },
+      }}
+    >
       {/* ヘッダーメニュー */}
       <AppShell.Header>
         <Grid h="100%" justify="space-between" align="center" px="lg">

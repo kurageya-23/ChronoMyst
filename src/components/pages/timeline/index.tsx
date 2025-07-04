@@ -1,24 +1,30 @@
+import "./style.css";
 import { ActionIcon, Affix, Grid, Group, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
-import EditEventModal from "../EditEventModal";
-
 import FullCalendar from "@fullcalendar/react";
+import { type EventApi } from "@fullcalendar/core";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import { useSelector } from "react-redux";
-import { timelineSlice } from "../../features/timelines/timelineSlice";
-import type { RootState } from "../../app/store";
-import "./TimelinePage.css";
-import type { Timeline } from "../../features/models";
-import CustomCalendarEvent from "../CustomCalendarEvent";
+import { useState } from "react";
+import type { Timeline } from "../../../features/models";
+import { timelineSlice } from "../../../features/timelines/timelineSlice";
+import CustomTimelineEvent from "../../CustomTimelineEvent";
+import type { RootState } from "../../../app/store";
+import EditTimelineEventModal from "./editTimelineEventModal";
 
 function TimelinePage() {
-  const { calendarEvents, config } = useSelector(
+  const { timelineEvents: timelineEvents, config } = useSelector(
     (state: RootState) => state[timelineSlice.reducerPath]
   ) as Timeline;
 
-  // イベント登録モーダル
   const [opened, { open, close }] = useDisclosure(false);
+  const handleClose = () => {
+    close();
+    setSelectedEvent(null);
+  };
+
+  const [selectedEvent, setSelectedEvent] = useState<EventApi | null>(null);
 
   return (
     <>
@@ -28,7 +34,15 @@ function TimelinePage() {
         {config.characters.map((c) => (
           <Grid.Col span="auto" flex="center" pt={0} px={0} key={c.id}>
             <Group justify="center">
-              <Text>{c.name}</Text>
+              <Text
+                style={{
+                  textDecoration: "underline",
+                  textDecorationColor: c.color,
+                  textDecorationThickness: "2px",
+                }}
+              >
+                {c.name}
+              </Text>
             </Group>
             <Group justify="center">
               <Text size="xs" color="dimmed">
@@ -40,12 +54,6 @@ function TimelinePage() {
       </Grid>
 
       {/* カレンダーコンテンツ */}
-      {/* <ScrollArea
-        scrollbars="y"
-        style={{
-          maxHeight: "calc(100vh - 100px)",
-        }}
-      > */}
       <Grid mx={12}>
         {/* 時間目盛り表示用 */}
         <Grid.Col span={1} px={0} className="axis-only">
@@ -71,7 +79,7 @@ function TimelinePage() {
           />
         </Grid.Col>
         {config.characters.map((c) => {
-          const filteredEvents = calendarEvents.filter((ev) =>
+          const filteredEvents = timelineEvents.filter((ev) =>
             ev.extendedProps.characters.some((ch) => ch.id === c.id)
           );
 
@@ -90,14 +98,18 @@ function TimelinePage() {
                 slotMinTime={config.startTime}
                 slotMaxTime={config.endTime}
                 scrollTime={config.startTime}
-                eventContent={CustomCalendarEvent}
+                eventContent={CustomTimelineEvent}
                 events={filteredEvents}
+                eventClick={(info) => {
+                  info.jsEvent.preventDefault();
+                  setSelectedEvent(info.event);
+                  open();
+                }}
               />
             </Grid.Col>
           );
         })}
       </Grid>
-      {/* </ScrollArea> */}
       <Affix position={{ bottom: 40, right: 40 }}>
         <Group>
           <Text size="sm">イベントの登録</Text>
@@ -106,7 +118,11 @@ function TimelinePage() {
           </ActionIcon>
         </Group>
       </Affix>
-      <EditEventModal opened={opened} onClose={close} />
+      <EditTimelineEventModal
+        opened={opened}
+        onClose={handleClose}
+        selectedEvent={selectedEvent}
+      />
     </>
   );
 }

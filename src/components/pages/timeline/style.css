@@ -1,3 +1,4 @@
+/* 一番左のFullCalendarは時間軸だけを表示する */
 .axis-only .fc-timegrid-cols {
   display: none !important;
 }

@@ -21,20 +21,8 @@ export type Place = {
   memo: string;
 };
 
-// TODO: 出来事
+// 出来事
 export type TimelineEvent = {
-  startTime: string;
-  endTime?: string;
-  placeId: string;
-  place: Place;
-  characterIds: string[];
-  characters: Character[];
-  color: string;
-  detail: string;
-};
-
-// TODO: 出来事
-export type CalendarEvent = {
   id: string;
   gourpId: string;
   start: string; // RTKの要件上、シリアライズ不能なDate型は使えないので、コンポーネント側でnew Date(str)する
@@ -78,8 +66,8 @@ export type TimelineConfig = {
 export type Timeline = {
   // シナリオ情報
   scenario: Scenario;
-  // TODO: 出来事リスト
-  calendarEvents: CalendarEvent[];
+  // 出来事リスト
+  timelineEvents: TimelineEvent[];
   // 設定
   config: TimelineConfig;
 };
@@ -91,18 +79,21 @@ export const charactersSample = [
     name: "キャラクターA",
     playerName: "プレイヤーA",
     memo: "つよそう",
+    color: "#fa5252"
   } as Character,
   {
     id: 2,
     name: "キャラクターB",
     playerName: "プレイヤーB",
     memo: "よわそう",
+    color: "#fa5252"
   } as Character,
   {
     id: 3,
     name: "キャラクターC",
     playerName: "プレイヤーC",
     memo: "かわいい",
+    color: "#fa5252"
   } as Character,
 ];
 
