@@ -31,7 +31,9 @@ const CustomTimelineEvent = (eventInfo: any) => {
           </Badge>
         )}
       </Group>
-      <Text size="12px">{event.title}</Text>
+      <Text size="14px" style={{ fontWeight: "bold" }}>
+        {event.title}
+      </Text>
     </Stack>
   );
 };

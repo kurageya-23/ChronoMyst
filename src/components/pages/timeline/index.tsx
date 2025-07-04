@@ -84,7 +84,12 @@ function TimelinePage() {
           );
 
           return (
-            <Grid.Col span="auto" px={0} key={c.id}>
+            <Grid.Col
+              span="auto"
+              px={0}
+              key={c.id}
+              className="character-timeline"
+            >
               <FullCalendar
                 plugins={[timeGridPlugin]}
                 initialView="timeGridDay"
@@ -105,6 +110,7 @@ function TimelinePage() {
                   setSelectedEvent(info.event);
                   open();
                 }}
+                eventMinHeight={50}
               />
             </Grid.Col>
           );
@@ -112,7 +118,9 @@ function TimelinePage() {
       </Grid>
       <Affix position={{ bottom: 40, right: 40 }}>
         <Group>
-          <Text size="sm">イベントの登録</Text>
+          <Text size="sm" color="white">
+            イベントの登録
+          </Text>
           <ActionIcon color="blue" radius="xl" size="lg" onClick={open}>
             <IconPlus stroke={1.5} size={32} />
           </ActionIcon>

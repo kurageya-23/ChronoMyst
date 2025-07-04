@@ -1,4 +1,12 @@
-import { AppShell, Text, Grid, TextInput, Title, Button } from "@mantine/core";
+import {
+  AppShell,
+  Text,
+  Grid,
+  TextInput,
+  Title,
+  Button,
+  rgba,
+} from "@mantine/core";
 import { useDispatch, useSelector } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { timelineSlice } from "../../features/timelines/timelineSlice";
@@ -25,15 +33,7 @@ export const Layout = () => {
   const [opened, { open, close }] = useDisclosure(false);
 
   return (
-    <AppShell
-      header={{ height: 40 }}
-      padding="sm"
-      styles={{
-        main: {
-          backgroundColor: "#fdfdfd",
-        },
-      }}
-    >
+    <AppShell header={{ height: 40 }} padding="sm">
       {/* ヘッダーメニュー */}
       <AppShell.Header>
         <Grid h="100%" justify="space-between" align="center" px="lg">
@@ -71,7 +71,7 @@ export const Layout = () => {
             {/* シナリオ設定ボタン */}
             <Button
               size="xs"
-              color="dark"
+              color="white"
               leftSection={<IconAdjustments />}
               variant="outline"
               onClick={open}

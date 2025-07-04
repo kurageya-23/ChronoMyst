@@ -14,3 +14,7 @@
 .axis-only .fc-timegrid-slot-lane {
   display: none !important;
 }
+
+.fc .fc-timegrid-slot {
+  height: 50px;
+}
