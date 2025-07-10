@@ -16,10 +16,14 @@ import { ColorSelector } from "../../../ColorSelector";
 import { useTimelineConfig } from "./hooks";
 import {
   CHARACTER_MAX_COUNT,
+  CHARACTER_MAX_LENGTH,
   CHARACTER_MIN_COUNT,
   INTERVAL_PRESETS,
   PLACE_MAX_COUNT,
+  PLACE_MAX_LENGTH,
+  PLACE_MEMO_MAX_LENGTH,
   PLACE_MIN_COUNT,
+  PLAYER_MAX_LENGTH,
 } from "../../../../app/appConstants";
 
 export type ConfigModalProps = {
@@ -107,12 +111,12 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
                     <TextInput
                       {...form.getInputProps(`characters.${i}.name`)}
                       placeholder="キャラクター名"
-                      maxLength={20}
+                      maxLength={CHARACTER_MAX_LENGTH}
                     />
                     <TextInput
                       {...form.getInputProps(`characters.${i}.playerName`)}
                       placeholder="プレイヤー名"
-                      maxLength={20}
+                      maxLength={PLAYER_MAX_LENGTH}
                     />
                     <ColorSelector
                       value={c.color}
@@ -146,10 +150,12 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
                     <TextInput
                       {...form.getInputProps(`places.${i}.name`)}
                       placeholder="場所名"
+                      maxLength={PLACE_MAX_LENGTH}
                     />
                     <TextInput
                       {...form.getInputProps(`places.${i}.memo`)}
                       placeholder="メモ"
+                      maxLength={PLACE_MEMO_MAX_LENGTH}
                     />
                   </>
                 )}
