@@ -10,10 +10,17 @@ import {
   Button,
   TextInput,
 } from "@mantine/core";
-import { TimeInput, TimePicker } from "@mantine/dates";
+import { TimePicker } from "@mantine/dates";
 import DynamicList from "../../../DynamicList";
 import { ColorSelector } from "../../../ColorSelector";
 import { useTimelineConfig } from "./hooks";
+import {
+  CHARACTER_MAX_COUNT,
+  CHARACTER_MIN_COUNT,
+  INTERVAL_PRESETS,
+  PLACE_MAX_COUNT,
+  PLACE_MIN_COUNT,
+} from "../../../../app/appConstants";
 
 export type ConfigModalProps = {
   opened: boolean;
@@ -37,12 +44,12 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
           <Stack gap={4}>
             {/* 時間設定 */}
             <Fieldset legend="時間">
-              <TimeInput
-                withAsterisk
-                label="間隔"
-                placeholder="ex1. 01:00 | ex2. 0:30"
-                minTime="00:10"
+              <TimePicker
                 {...form.getInputProps("interval")}
+                label="間隔"
+                withAsterisk
+                withDropdown
+                presets={INTERVAL_PRESETS}
               />
 
               <Grid align="flex-end" mt="sm">
@@ -73,61 +80,81 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
             </Fieldset>
 
             {/* 登場人物 */}
-            <DynamicList
-              legend="登場人物"
-              items={form.values.characters}
-              onInsert={() =>
-                form.insertListItem("characters", {
-                  name: "",
-                  playerName: "",
-                  color: "#228be6",
-                  memo: "",
-                })
-              }
-              onRemove={(i) => form.removeListItem("characters", i)}
-              renderItem={(c, i) => (
-                <>
-                  <Text size="sm">{i + 1}.</Text>
-                  <TextInput
-                    {...form.getInputProps(`characters.${i}.name`)}
-                    placeholder="キャラクター名"
-                  />
-                  <TextInput
-                    {...form.getInputProps(`characters.${i}.playerName`)}
-                    placeholder="プレイヤー名"
-                  />
-                  <ColorSelector
-                    value={c.color}
-                    onChange={(col) =>
-                      form.setFieldValue(`characters.${i}.color`, col)
-                    }
-                  />
-                </>
-              )}
-            />
+            <Fieldset legend="登場人物" mt="md">
+              <Text size="xs" color="dimmed">
+                1～10名まで設定できます
+              </Text>
+              {/* TODO: Mantine の <FormList> を使うと、リスト内アイテムのエラー管理とレイアウトが自動的にハンドリングできます。 */}
+              <DynamicList
+                items={form.values.characters}
+                min={CHARACTER_MIN_COUNT}
+                max={CHARACTER_MAX_COUNT}
+                errorMessage={form.errors.characters?.toString()}
+                onInsert={() => {
+                  form.insertListItem("characters", {
+                    name: "",
+                    playerName: "",
+                    color: "#228be6",
+                    memo: "",
+                  });
+                }}
+                onRemove={(i) => {
+                  form.removeListItem("characters", i);
+                }}
+                renderItem={(c, i) => (
+                  <>
+                    <Text size="sm">{i + 1}.</Text>
+                    <TextInput
+                      {...form.getInputProps(`characters.${i}.name`)}
+                      placeholder="キャラクター名"
+                      maxLength={20}
+                    />
+                    <TextInput
+                      {...form.getInputProps(`characters.${i}.playerName`)}
+                      placeholder="プレイヤー名"
+                      maxLength={20}
+                    />
+                    <ColorSelector
+                      value={c.color}
+                      onChange={(col) =>
+                        form.setFieldValue(`characters.${i}.color`, col)
+                      }
+                    />
+                  </>
+                )}
+              />
+            </Fieldset>
 
             {/* 場所 */}
-            <DynamicList
-              legend="場所"
-              items={form.values.places}
-              onInsert={() =>
-                form.insertListItem("places", { name: "", memo: "" })
-              }
-              onRemove={(i) => form.removeListItem("places", i)}
-              renderItem={(_, i) => (
-                <>
-                  <Text size="sm">{i + 1}.</Text>
-                  <TextInput
-                    {...form.getInputProps(`places.${i}.name`)}
-                    placeholder="場所名"
-                  />
-                  <TextInput
-                    {...form.getInputProps(`places.${i}.memo`)}
-                    placeholder="メモ"
-                  />
-                </>
-              )}
-            />
+            <Fieldset legend="場所" mt="md">
+              <Text size="xs" color="dimmed">
+                最大10か所まで設定できます
+              </Text>
+              {/* TODO: Mantine の <FormList> を使うと、リスト内アイテムのエラー管理とレイアウトが自動的にハンドリングできます。 */}
+              <DynamicList
+                items={form.values.places}
+                min={PLACE_MIN_COUNT}
+                max={PLACE_MAX_COUNT}
+                errorMessage={form.errors.places?.toString()}
+                onInsert={() =>
+                  form.insertListItem("places", { name: "", memo: "" })
+                }
+                onRemove={(i) => form.removeListItem("places", i)}
+                renderItem={(_, i) => (
+                  <>
+                    <Text size="sm">{i + 1}.</Text>
+                    <TextInput
+                      {...form.getInputProps(`places.${i}.name`)}
+                      placeholder="場所名"
+                    />
+                    <TextInput
+                      {...form.getInputProps(`places.${i}.memo`)}
+                      placeholder="メモ"
+                    />
+                  </>
+                )}
+              />
+            </Fieldset>
 
             <Group justify="flex-end" mt="md">
               <Button type="submit" color="teal">

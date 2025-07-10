@@ -5,6 +5,7 @@ import { getTimeRange, isTimeAfter } from "@mantine/dates";
 import { timelineSlice } from "../../../../features/timelines/timelineSlice";
 import type { RootState } from "../../../../app/store";
 import type { TimelineConfig } from "../../../../features/models";
+import { configModalValidator } from "./validator";
 
 export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
   const dispatch = useDispatch();
@@ -26,6 +27,7 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
   const form = useForm<TimelineConfig>({
     mode: "controlled",
     initialValues,
+    validate: configModalValidator,
   });
 
   // opened フラグが true に変わった瞬間だけ、フォーム値を初期値に上書きする
