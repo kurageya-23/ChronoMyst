@@ -1,5 +1,5 @@
 import "./style.css";
-import { ActionIcon, Affix, Grid, Group, Text } from "@mantine/core";
+import { ActionIcon, Affix, Group, Text } from "@mantine/core";
 import { IconPlus } from "@tabler/icons-react";
 import { useDisclosure } from "@mantine/hooks";
 import FullCalendar from "@fullcalendar/react";
@@ -13,8 +13,9 @@ import CustomTimelineEvent from "../../CustomTimelineEvent";
 import type { RootState } from "../../../app/store";
 import EditTimelineEventModal from "./editTimelineEventModal";
 
+/** タイムラインページ */
 function TimelinePage() {
-  const { timelineEvents: timelineEvents, config } = useSelector(
+  const { timelineEvents, config } = useSelector(
     (state: RootState) => state[timelineSlice.reducerPath]
   ) as Timeline;
 
@@ -26,96 +27,115 @@ function TimelinePage() {
 
   const [selectedEvent, setSelectedEvent] = useState<EventApi | null>(null);
 
+  // colgroup 用に「時間軸＋キャラ列」を定義
+  const cols = [
+    <col key="time" style={{ width: 50 }} />,
+    ...config.characters.map((c) => (
+      <col key={c.id} style={{ width: "auto" }} />
+    )),
+  ];
+
   return (
-    <>
-      {/* カレンダーヘッダー */}
-      <Grid py={0}>
-        <Grid.Col span={1}></Grid.Col>
-        {config.characters.map((c) => (
-          <Grid.Col span="auto" flex="center" pt={0} px={0} key={c.id}>
-            <Group justify="center">
-              <Text
-                style={{
-                  textDecoration: "underline",
-                  textDecorationColor: c.color,
-                  textDecorationThickness: "2px",
-                }}
-              >
-                {c.name}
-              </Text>
-            </Group>
-            <Group justify="center">
-              <Text size="xs" color="dimmed">
-                {c.playerName}
-              </Text>
-            </Group>
-          </Grid.Col>
-        ))}
-      </Grid>
+    <div className="timeline-container">
+      <table className="timeline-table">
+        <colgroup>{cols}</colgroup>
+        {/* タイムラインヘッダー */}
+        <thead>
+          <tr>
+            <th>Time</th>
+            {config.characters.map((c) => (
+              <th key={c.id}>
+                {/* キャラクター名 */}
+                <Group justify="center">
+                  <Text
+                    style={{
+                      textDecoration: "underline",
+                      textDecorationColor: c.color,
+                      textDecorationThickness: "2px",
+                    }}
+                  >
+                    {c.name}
+                  </Text>
+                </Group>
+                {/* プレイヤー名 */}
+                <Group justify="center">
+                  <Text size="xs" color="dimmed">
+                    {c.playerName}
+                  </Text>
+                </Group>
+              </th>
+            ))}
+          </tr>
+        </thead>
 
-      {/* カレンダーコンテンツ */}
-      <Grid mx={12}>
-        {/* 時間目盛り表示用 */}
-        <Grid.Col span={1} px={0} className="axis-only">
-          <FullCalendar
-            plugins={[timeGridPlugin]}
-            initialView="timeGridDay"
-            locale="en"
-            allDaySlot={false}
-            dayHeaders={false}
-            headerToolbar={false}
-            dayHeaderContent={() => null}
-            contentHeight="auto"
-            slotLabelContent={(arg) => {
-              const date = arg.date;
-              const hour = date.getHours();
-              const minute = String(date.getMinutes()).padStart(2, "0");
-              return `${hour}:${minute}`;
-            }}
-            slotMinTime={config.startTime}
-            slotMaxTime={config.endTime}
-            scrollTime={config.startTime}
-            events={[]}
-          />
-        </Grid.Col>
-        {config.characters.map((c) => {
-          const filteredEvents = timelineEvents.filter((ev) =>
-            ev.extendedProps.characters.some((ch) => ch.id === c.id)
-          );
-
-          return (
-            <Grid.Col
-              span="auto"
-              px={0}
-              key={c.id}
-              className="character-timeline"
-            >
+        {/* タイムラインコンテンツ */}
+        <tbody>
+          <tr>
+            {/* --- 時間軸だけの FullCalendar --- */}
+            <td style={{ height: "100%" }} className="axis-only">
               <FullCalendar
                 plugins={[timeGridPlugin]}
                 initialView="timeGridDay"
-                locale="ja"
+                locale="en"
                 allDaySlot={false}
                 dayHeaders={false}
                 headerToolbar={false}
                 dayHeaderContent={() => null}
                 contentHeight="auto"
-                slotLabelContent={() => null}
+                slotLabelContent={(arg) => {
+                  const date = arg.date;
+                  const hour = date.getHours();
+                  const minute = String(date.getMinutes()).padStart(2, "0");
+                  return `${hour}:${minute}`;
+                }}
                 slotMinTime={config.startTime}
                 slotMaxTime={config.endTime}
                 scrollTime={config.startTime}
-                eventContent={CustomTimelineEvent}
-                events={filteredEvents}
-                eventClick={(info) => {
-                  info.jsEvent.preventDefault();
-                  setSelectedEvent(info.event);
-                  open();
-                }}
-                eventMinHeight={50}
+                events={[]}
               />
-            </Grid.Col>
-          );
-        })}
-      </Grid>
+            </td>
+
+            {/* --- 各キャラクターごとの FullCalendar --- */}
+            {config.characters.map((c) => {
+              const filteredEvents = timelineEvents.filter((ev) =>
+                ev.extendedProps.characters.some((ch) => ch.id === c.id)
+              );
+              return (
+                <td
+                  key={c.id}
+                  style={{ height: "100%" }}
+                  className="character-timeline"
+                >
+                  <FullCalendar
+                    plugins={[timeGridPlugin]}
+                    initialView="timeGridDay"
+                    locale="ja"
+                    allDaySlot={false}
+                    dayHeaders={false}
+                    headerToolbar={false}
+                    dayHeaderContent={() => null}
+                    contentHeight="auto"
+                    slotLabelContent={() => null}
+                    slotMinTime={config.startTime}
+                    slotMaxTime={config.endTime}
+                    scrollTime={config.startTime}
+                    eventContent={CustomTimelineEvent}
+                    events={filteredEvents}
+                    eventClick={(info) => {
+                      info.jsEvent.preventDefault();
+                      setSelectedEvent(info.event);
+                      open();
+                    }}
+                    eventMinHeight={50}
+                  />
+                </td>
+              );
+            })}
+          </tr>
+        </tbody>
+      </table>
+
+      {/* イベント登録フロートボタン */}
       <Affix position={{ bottom: 40, right: 40 }}>
         <Group>
           <Text size="sm" color="white">
@@ -126,12 +146,14 @@ function TimelinePage() {
           </ActionIcon>
         </Group>
       </Affix>
+
+      {/* イベント登録モーダル */}
       <EditTimelineEventModal
         opened={opened}
         onClose={handleClose}
         selectedEvent={selectedEvent}
       />
-    </>
+    </div>
   );
 }
 

@@ -18,3 +18,39 @@
 .fc .fc-timegrid-slot {
   height: 50px;
 }
+
+/* タイムラインテーブルの設定 */
+.timeline-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto; /* 横にも縦にもスクロール */
+}
+
+.timeline-table {
+  border-collapse: collapse;
+  table-layout: fixed; /* colgroup の幅を厳密に適用 */
+  width: auto; /* col の合計幅に合わせる */
+  max-width: 100%;
+}
+
+.timeline-table th,
+.timeline-table td {
+  border: 1px solid #ddd;
+  padding: 0;
+  margin: 0;
+}
+
+/* ヘッダー行を上部に貼り付け */
+.timeline-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+/* 左端（time列）を固定 */
+.timeline-table thead th:first-child,
+.timeline-table tbody td:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 2;
+}
