@@ -1,5 +1,5 @@
 import type { FormValidateInput } from "@mantine/form";
-import type { TimelineEventFormData } from "./hooks";
+import type { TimelineEventFormData } from "../../../../features/models";
 
 export const editEventModalValidator: FormValidateInput<TimelineEventFormData> =
   {
