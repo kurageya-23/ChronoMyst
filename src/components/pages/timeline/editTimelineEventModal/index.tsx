@@ -21,8 +21,9 @@ import {
 } from "../../../../features/timelines/timelineSlice";
 import { COLOR_SET } from "../../../../app/appConstants";
 import { type EventApi } from "@fullcalendar/core";
-import { useTimelineEvent, type TimelineEventFormData } from "./hooks";
+import { useTimelineEvent } from "./hooks";
 import { editEventModalValidator } from "./validator";
+import type { TimelineEventFormData } from "../../../../features/models";
 
 export type EditTimelineEventModalProps = {
   opened: boolean;
@@ -86,6 +87,7 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
     } else {
       form.setValues(initialValues);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, initialValues]);
 
   const handleSubmit = (values: typeof form.values) => {
