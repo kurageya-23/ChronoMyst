@@ -109,6 +109,13 @@ export const timelineSlice = createAppSlice({
         );
       }
     ),
+    /** Jsonファイルのインポート */
+    jsonImport: create.reducer((state, action: PayloadAction<Timeline>) => {
+      console.debug("[reducer] jsonImport start.", action.payload);
+      // まるごと上書き
+      Object.assign(state, action.payload);
+      console.debug("[reducer] jsonImport end.");
+    }),
   }),
   selectors: {
     selectTimeline: (timeline) => timeline,

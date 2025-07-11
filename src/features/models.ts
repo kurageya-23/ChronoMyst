@@ -95,6 +95,13 @@ export type Timeline = {
   config: TimelineConfig;
 };
 
+/** タイムラインデータのJson定義 */
+export type TimelineJson = {
+  appName: string;
+  version: string;
+  data: Timeline;
+};
+
 /** --------モデルに関する処理-------- */
 /** 時刻文字列 → 今日の日付ISO */
 const toToday = (timeStr: string): string => {
