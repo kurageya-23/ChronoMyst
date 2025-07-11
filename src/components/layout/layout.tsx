@@ -1,20 +1,32 @@
-import { AppShell, Text, Grid, TextInput, Title, Button } from "@mantine/core";
-import { useDispatch, useSelector } from "react-redux";
+import {
+  AppShell,
+  Text,
+  Grid,
+  TextInput,
+  Title,
+  Button,
+  Menu,
+  Flex,
+} from "@mantine/core";
+import { useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
 import { timelineSlice } from "../../features/timelines/timelineSlice";
-import type { RootState } from "../../app/store";
-import { useEffect, useState } from "react";
-import { useDebouncedValue, useDisclosure } from "@mantine/hooks";
-import { IconAdjustments } from "@tabler/icons-react";
+import { useEffect } from "react";
+import { useDisclosure } from "@mantine/hooks";
+import {
+  IconAdjustments,
+  IconBookFilled,
+  IconFileExport,
+  IconFileImport,
+} from "@tabler/icons-react";
 import ConfigModal from "../pages/timeline/configModal";
-import type { Timeline } from "../../features/models";
+import { useLayout } from "./hooks";
+
+import pkg from "../../../package.json";
+const appVersion = pkg.version;
 
 export const Layout = () => {
-  const { scenario } = useSelector(
-    (state: RootState) => state[timelineSlice.reducerPath]
-  ) as Timeline;
-  const [value, setValue] = useState(scenario.name);
-  const [debounced] = useDebouncedValue(value, 1000);
+  const { scenarioName, setScenarioName, debounced } = useLayout();
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -22,7 +34,10 @@ export const Layout = () => {
   }, [debounced, dispatch]);
 
   // 設定モーダル
-  const [opened, { open, close }] = useDisclosure(false);
+  const [
+    isConfigModalOpen,
+    { open: configModalOpen, close: configModalClose },
+  ] = useDisclosure(false);
 
   return (
     <AppShell header={{ height: 40 }} padding="sm">
@@ -52,31 +67,73 @@ export const Layout = () => {
                   variant="unstyled"
                   w="100%"
                   maxLength={40}
-                  value={value}
-                  onChange={(event) => setValue(event.currentTarget.value)}
+                  value={scenarioName}
+                  onChange={(event) =>
+                    setScenarioName(event.currentTarget.value)
+                  }
                 ></TextInput>
               </Grid.Col>
             </Grid>
           </Grid.Col>
           {/* ヘッダー右側 */}
           <Grid.Col span="content">
-            {/* シナリオ設定ボタン */}
-            <Button
-              size="xs"
-              color="white"
-              leftSection={<IconAdjustments />}
-              variant="outline"
-              onClick={open}
-            >
-              シナリオ設定
-            </Button>
+            <Flex gap={6} align={"flex-end"}>
+              <Text size="xs" color="dimmed">
+                ver.{appVersion}
+              </Text>
+              {/* システムメニュー */}
+              <SystemMenuToggle open={configModalOpen} />
+            </Flex>
           </Grid.Col>
         </Grid>
       </AppShell.Header>
       <AppShell.Main>
         <Outlet />
-        <ConfigModal opened={opened} onClose={close} />
+        <ConfigModal opened={isConfigModalOpen} onClose={configModalClose} />
       </AppShell.Main>
     </AppShell>
+  );
+};
+
+type SystemMenuToggleProps = {
+  open: () => void;
+};
+
+/** システムメニュー */
+const SystemMenuToggle: React.FC<SystemMenuToggleProps> = ({ open }) => {
+  const { handleImport, handleExport } = useLayout();
+  return (
+    <Menu shadow="md" width={200}>
+      <Menu.Target>
+        <Button
+          size="xs"
+          color="white"
+          leftSection={<IconAdjustments />}
+          variant="outline"
+        >
+          システム設定
+        </Button>
+      </Menu.Target>
+
+      <Menu.Dropdown>
+        <Menu.Item leftSection={<IconBookFilled size={14} />} onClick={open}>
+          シナリオ設定
+        </Menu.Item>
+        <Menu.Divider />
+        <Menu.Label>読込/保存</Menu.Label>
+        <Menu.Item
+          leftSection={<IconFileImport size={14} />}
+          onClick={handleImport}
+        >
+          ファイル(.json)を読み込み
+        </Menu.Item>
+        <Menu.Item
+          leftSection={<IconFileExport size={14} />}
+          onClick={handleExport}
+        >
+          ファイル(.json)に保存
+        </Menu.Item>
+      </Menu.Dropdown>
+    </Menu>
   );
 };

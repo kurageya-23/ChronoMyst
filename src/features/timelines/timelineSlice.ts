@@ -7,6 +7,7 @@ import {
   type Scenario,
   type Timeline,
   type TimelineConfig,
+  type EditCharacterMemoFormData,
 } from "../models";
 import type { RootState } from "../../app/store";
 
@@ -47,6 +48,21 @@ export const timelineSlice = createAppSlice({
         console.debug("[reducer] updateConfig start.", action.payload);
         state.config = action.payload;
         console.debug("[reducer] updateConfig end.");
+      }
+    ),
+    /** キャラクターメモの更新 */
+    updateCharacterMemo: create.reducer(
+      (state, action: PayloadAction<EditCharacterMemoFormData>) => {
+        console.debug("[reducer] updateCharacterMemo start.", action.payload);
+        // キャラクターIDからキャラクターを特定し、メモの内容を更新
+        const { selectedCharacterId, memo } = action.payload;
+        const character = state.config.characters.find(
+          (c) => c.id === selectedCharacterId
+        );
+        if (character) {
+          character.memo = memo;
+        }
+        console.debug("[reducer] updateCharacterMemo end.");
       }
     ),
     /** イベント登録 */

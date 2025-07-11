@@ -1,33 +1,23 @@
 import "./style.css";
-import { ActionIcon, Affix, Group, Text } from "@mantine/core";
-import { IconPlus } from "@tabler/icons-react";
-import { useDisclosure } from "@mantine/hooks";
+import { ActionIcon, Affix, Group, Text, Tooltip } from "@mantine/core";
+import { IconNotebook, IconPlus } from "@tabler/icons-react";
 import FullCalendar from "@fullcalendar/react";
-import { type EventApi } from "@fullcalendar/core";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin from "@fullcalendar/interaction";
 import { useSelector } from "react-redux";
-import { useState } from "react";
 import { type Timeline } from "../../../features/models";
 import { timelineSlice } from "../../../features/timelines/timelineSlice";
 import CustomTimelineEvent from "../../CustomTimelineEvent";
 import type { RootState } from "../../../app/store";
 import EditTimelineEventModal from "./editTimelineEventModal";
 import { useTimeline } from "./hooks";
+import EditCharacterMemoModal from "./editCharacterMemoModal";
 
 /** タイムラインページ */
 function TimelinePage() {
   const { timelineEvents, config } = useSelector(
     (state: RootState) => state[timelineSlice.reducerPath]
   ) as Timeline;
-
-  const [opened, { open, close }] = useDisclosure(false);
-  const handleClose = () => {
-    close();
-    setSelectedEvent(null);
-  };
-
-  const [selectedEvent, setSelectedEvent] = useState<EventApi | null>(null);
 
   // colgroup 用に「時間軸＋キャラ列」を定義
   const cols = [
@@ -38,10 +28,20 @@ function TimelinePage() {
   ];
 
   // カスタムフックからロジックを取得
-  const { handleEventDrop, handleEventResize } = useTimeline(
+  const {
+    handleEventDrop,
+    handleEventResize,
     selectedEvent,
-    config
-  );
+    setSelectedEvent,
+    isEditTimelineEventModalOpen,
+    EditTimelineEventOpen,
+    handleEditTimelineEventClose,
+    selectedCharacter,
+    setSelectedCharacter,
+    isEditCharacterMemoModalOpen,
+    EditCharacterMemoModalOpen,
+    handleEditCharacterMemoClose,
+  } = useTimeline(config);
 
   return (
     <div className="timeline-container">
@@ -54,16 +54,43 @@ function TimelinePage() {
             {config.characters.map((c) => (
               <th key={c.id}>
                 {/* キャラクター名 */}
-                <Group justify="center">
-                  <Text
-                    style={{
-                      textDecoration: "underline",
-                      textDecorationColor: c.color,
-                      textDecorationThickness: "2px",
+                <Group justify="center" gap={4}>
+                  <Tooltip
+                    label={c.memo}
+                    styles={{
+                      tooltip: {
+                        whiteSpace: "pre-line", // 改行コード \n を反映
+                        maxWidth: 200, // 必要に応じて幅を制限
+                        fontSize: "12px",
+                      },
                     }}
                   >
-                    {c.name}
-                  </Text>
+                    <Text
+                      style={{
+                        textDecoration: "underline",
+                        textDecorationColor: c.color,
+                        textDecorationThickness: "2px",
+                      }}
+                    >
+                      {c.name}
+                    </Text>
+                  </Tooltip>
+                  <ActionIcon
+                    variant="filled"
+                    color="teal"
+                    size="sm"
+                    aria-label="Settings"
+                    onClick={() => {
+                      setSelectedCharacter(c);
+                      console.log(c, selectedCharacter);
+                      EditCharacterMemoModalOpen();
+                    }}
+                  >
+                    <IconNotebook
+                      style={{ width: "80%", height: "80%" }}
+                      stroke={1.5}
+                    />
+                  </ActionIcon>
                 </Group>
                 {/* プレイヤー名 */}
                 <Group justify="center">
@@ -132,7 +159,7 @@ function TimelinePage() {
                     eventClick={(info) => {
                       info.jsEvent.preventDefault();
                       setSelectedEvent(info.event);
-                      open();
+                      EditTimelineEventOpen();
                     }}
                     editable
                     eventDrop={handleEventDrop}
@@ -152,7 +179,12 @@ function TimelinePage() {
           <Text size="sm" color="white">
             イベントの登録
           </Text>
-          <ActionIcon color="blue" radius="xl" size="lg" onClick={open}>
+          <ActionIcon
+            color="blue"
+            radius="xl"
+            size="lg"
+            onClick={EditTimelineEventOpen}
+          >
             <IconPlus stroke={1.5} size={32} />
           </ActionIcon>
         </Group>
@@ -160,9 +192,16 @@ function TimelinePage() {
 
       {/* イベント登録モーダル */}
       <EditTimelineEventModal
-        opened={opened}
-        onClose={handleClose}
+        opened={isEditTimelineEventModalOpen}
+        onClose={handleEditTimelineEventClose}
         selectedEvent={selectedEvent}
+      />
+
+      {/* キャラクターメモ編集モーダル */}
+      <EditCharacterMemoModal
+        opened={isEditCharacterMemoModalOpen}
+        onClose={handleEditCharacterMemoClose}
+        selectedCharacter={selectedCharacter}
       />
     </div>
   );

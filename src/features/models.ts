@@ -64,6 +64,12 @@ export type TimelineEventFormData = {
   detail: string;
 };
 
+/** キャラクターメモ専用データ定義 */
+export type EditCharacterMemoFormData = {
+  selectedCharacterId: number;
+  memo: string;
+};
+
 // カレンダーイベントの拡張プロパティ
 export type ExtendedCalenderEventProp = {
   characters: Character[];
