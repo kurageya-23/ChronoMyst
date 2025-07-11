@@ -5,13 +5,15 @@ import { useDisclosure } from "@mantine/hooks";
 import FullCalendar from "@fullcalendar/react";
 import { type EventApi } from "@fullcalendar/core";
 import timeGridPlugin from "@fullcalendar/timegrid";
+import interactionPlugin from "@fullcalendar/interaction";
 import { useSelector } from "react-redux";
 import { useState } from "react";
-import type { Timeline } from "../../../features/models";
+import { type Timeline } from "../../../features/models";
 import { timelineSlice } from "../../../features/timelines/timelineSlice";
 import CustomTimelineEvent from "../../CustomTimelineEvent";
 import type { RootState } from "../../../app/store";
 import EditTimelineEventModal from "./editTimelineEventModal";
+import { useTimeline } from "./hooks";
 
 /** タイムラインページ */
 function TimelinePage() {
@@ -34,6 +36,12 @@ function TimelinePage() {
       <col key={c.id} style={{ width: "auto" }} />
     )),
   ];
+
+  // カスタムフックからロジックを取得
+  const { handleEventDrop, handleEventResize } = useTimeline(
+    selectedEvent,
+    config
+  );
 
   return (
     <div className="timeline-container">
@@ -107,7 +115,7 @@ function TimelinePage() {
                   className="character-timeline"
                 >
                   <FullCalendar
-                    plugins={[timeGridPlugin]}
+                    plugins={[timeGridPlugin, interactionPlugin]}
                     initialView="timeGridDay"
                     locale="ja"
                     allDaySlot={false}
@@ -126,6 +134,9 @@ function TimelinePage() {
                       setSelectedEvent(info.event);
                       open();
                     }}
+                    editable
+                    eventDrop={handleEventDrop}
+                    eventResize={handleEventResize}
                     eventMinHeight={50}
                   />
                 </td>

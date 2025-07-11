@@ -21,7 +21,9 @@ import {
 } from "../../../../features/timelines/timelineSlice";
 import { COLOR_SET } from "../../../../app/appConstants";
 import { type EventApi } from "@fullcalendar/core";
-import { useTimelineEvent, type TimelineEventFormData } from "./hooks";
+import { useTimelineEvent } from "./hooks";
+import { editEventModalValidator } from "./validator";
+import type { TimelineEventFormData } from "../../../../features/models";
 
 export type EditTimelineEventModalProps = {
   opened: boolean;
@@ -72,9 +74,10 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
   } = useTimelineEvent(selectedEvent, config);
 
   // フォームデータ
-  const form = useForm({
+  const form = useForm<TimelineEventFormData>({
     initialValues,
     mode: "controlled",
+    validate: editEventModalValidator,
   });
 
   // モーダル開閉でリセット＋初期化
@@ -84,6 +87,7 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
     } else {
       form.setValues(initialValues);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, initialValues]);
 
   const handleSubmit = (values: typeof form.values) => {
@@ -117,19 +121,38 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
           ) : (
             <></>
           )}
+          {/* 開始時間、終了時間 */}
           <TimeRangePicker times={times} form={form} />
+
+          {/* メモ */}
           <TextareaInput form={form} />
-          <ListChipSelector
-            label="関係者（複数選択可）"
-            multiple
-            data={config.characters.map((c) => ({
-              value: String(c.id),
-              label: c.name,
-              color: c.color,
-            }))}
-            value={form.values.characterIds}
-            onChange={(v) => form.setFieldValue("characterIds", v as string[])}
-          />
+
+          {/* 関係者 */}
+          <Stack gap={0}>
+            <Text size="sm" w={500} mb="xs">
+              関係者（複数選択可）
+            </Text>
+            <Chip.Group
+              multiple
+              value={form.values.characterIds}
+              {...form.getInputProps(`characterIds`)}
+            >
+              <Group gap="xs" wrap="wrap">
+                {config.characters.map((c) => (
+                  <Chip key={String(c.id)} value={String(c.id)} color={c.color}>
+                    {c.name}
+                  </Chip>
+                ))}
+              </Group>
+            </Chip.Group>
+          </Stack>
+          {form.errors.characterIds && (
+            <Text color="red" size="sm" mt="xs">
+              {form.errors.characterIds?.toString()}
+            </Text>
+          )}
+
+          {/* 場所 */}
           <ListChipSelector
             label="場所"
             multiple={false}

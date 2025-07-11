@@ -1,3 +1,7 @@
+import type { EventApi } from "@fullcalendar/core";
+import { v4 as uuidv4 } from "uuid";
+
+/** --------データモデル-------- */
 // シナリオ
 export type Scenario = {
   name: string;
@@ -47,6 +51,19 @@ export type TimelineEvent = {
   extendedProps: ExtendedCalenderEventProp;
 };
 
+/** イベント登録専用データ定義 */
+export type TimelineEventFormData = {
+  id: string;
+  startTime: string;
+  endTime?: string;
+  placeId: string;
+  place: Place;
+  characterIds: string[];
+  characters: Character[];
+  color: string;
+  detail: string;
+};
+
 // カレンダーイベントの拡張プロパティ
 export type ExtendedCalenderEventProp = {
   characters: Character[];
@@ -72,6 +89,91 @@ export type Timeline = {
   config: TimelineConfig;
 };
 
+/** --------モデルに関する処理-------- */
+/** 時刻文字列 → 今日の日付ISO */
+const toToday = (timeStr: string): string => {
+  const today = new Date();
+  const [h, m] = timeStr.split(":").map(Number);
+  return new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+    h,
+    m,
+    0,
+    0
+  ).toISOString();
+};
+
+/** FullCalendar EventApi → フォームの型 */
+export const calendarToForm = (event: EventApi): TimelineEventFormData => {
+  const isoToHM = (iso: string) => {
+    const d = new Date(iso);
+    return (
+      `${String(d.getHours()).padStart(2, "0")}:` +
+      `${String(d.getMinutes()).padStart(2, "0")}`
+    );
+  };
+
+  return {
+    id: event.id,
+    startTime: event.startStr ? isoToHM(event.startStr) : "",
+    endTime: event.endStr ? isoToHM(event.endStr) : "",
+    detail: event.title,
+    color: event.backgroundColor,
+    characterIds: ((event.extendedProps.characters as Character[]) ?? []).map(
+      (c) => String(c.id)
+    ),
+    characters: (event.extendedProps.characters as Character[]) ?? [],
+    placeId: String((event.extendedProps.place as Place)?.id ?? ""),
+    place: event.extendedProps.place as Place,
+  };
+};
+
+/** フォームの型 → FullCalendar 用イベント型 */
+export const formToCalendar = (form: TimelineEventFormData) =>
+  ({
+    id: form.id,
+    title: form.detail,
+    start: toToday(form.startTime),
+    end: form.endTime ? toToday(form.endTime) : "",
+    borderColor: form.color,
+    backgroundColor: form.color,
+    extendedProps: {
+      characters: form.characters,
+      place: form.place,
+    },
+  } as TimelineEvent);
+
+/** キャラクターと場所を解決 */
+export const solveTimelineEvent = (
+  values: TimelineEventFormData,
+  config: TimelineConfig
+): TimelineEventFormData => {
+  const characters = values.characterIds
+    .map(
+      (id: string) =>
+        config.characters.find((c: Character) => String(c.id) === id)!
+    )
+    .filter(Boolean);
+  const place = config.places.find(
+    (p: Place) => String(p.id) === values.placeId
+  )!;
+  return { ...values, characters, place };
+};
+
+export const assignTimelineEventId = (
+  values: TimelineEventFormData,
+  isNew: boolean
+) => {
+  const formWithId =
+    isNew && !values.id
+      ? ({ ...values, id: uuidv4() } as unknown as TimelineEventFormData)
+      : values;
+  return formToCalendar(formWithId);
+};
+
+/** -------サンプルデータ-------- */
 // キャラクターデータのサンプル
 export const charactersSample = [
   {
@@ -79,21 +181,21 @@ export const charactersSample = [
     name: "キャラクターA",
     playerName: "プレイヤーA",
     memo: "つよそう",
-    color: "#fa5252"
+    color: "#fa5252",
   } as Character,
   {
     id: 2,
     name: "キャラクターB",
     playerName: "プレイヤーB",
     memo: "よわそう",
-    color: "#fa5252"
+    color: "#fa5252",
   } as Character,
   {
     id: 3,
     name: "キャラクターC",
     playerName: "プレイヤーC",
     memo: "かわいい",
-    color: "#fa5252"
+    color: "#fa5252",
   } as Character,
 ];
 
