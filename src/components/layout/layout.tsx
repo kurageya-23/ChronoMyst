@@ -22,11 +22,15 @@ import {
 import ConfigModal from "../pages/timeline/configModal";
 import { useLayout } from "./hooks";
 
-import pkg from "../../../package.json";
-const appVersion = pkg.version;
-
 export const Layout = () => {
-  const { scenarioName, setScenarioName, debounced } = useLayout();
+  const {
+    appVersion,
+    scenarioName,
+    setScenarioName,
+    debounced,
+    handleImport,
+    handleExport,
+  } = useLayout();
 
   const dispatch = useDispatch();
   useEffect(() => {
@@ -82,7 +86,11 @@ export const Layout = () => {
                 ver.{appVersion}
               </Text>
               {/* システムメニュー */}
-              <SystemMenuToggle open={configModalOpen} />
+              <SystemMenuToggle
+                handleImport={handleImport}
+                handleExport={handleExport}
+                open={configModalOpen}
+              />
             </Flex>
           </Grid.Col>
         </Grid>
@@ -96,12 +104,17 @@ export const Layout = () => {
 };
 
 type SystemMenuToggleProps = {
+  handleImport: () => void;
+  handleExport: () => void;
   open: () => void;
 };
 
 /** システムメニュー */
-const SystemMenuToggle: React.FC<SystemMenuToggleProps> = ({ open }) => {
-  const { handleImport, handleExport } = useLayout();
+const SystemMenuToggle: React.FC<SystemMenuToggleProps> = ({
+  handleImport,
+  handleExport,
+  open,
+}) => {
   return (
     <Menu shadow="md" width={200}>
       <Menu.Target>
