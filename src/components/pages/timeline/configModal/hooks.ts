@@ -6,6 +6,8 @@ import { timelineSlice } from "../../../../features/timelines/timelineSlice";
 import type { RootState } from "../../../../app/store";
 import type { TimelineConfig } from "../../../../features/models";
 import { configModalValidator } from "./validator";
+import { v4 as uuidv4 } from "uuid";
+import { useNextSort } from "../../../../features/utils/useNextSort";
 
 export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
   const dispatch = useDispatch();
@@ -50,6 +52,47 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
     });
   }, [form.values.interval]);
 
+  const nextCharacterSort = useNextSort(form.values.characters);
+  /** キャラクター追加 */
+  const onCharacterInsert = useCallback(() => {
+    form.insertListItem("characters", {
+      id: uuidv4(),
+      name: "",
+      playerName: "",
+      color: "#228be6",
+      memo: "",
+      sort: nextCharacterSort,
+    });
+  }, [form]);
+
+  /** キャラクター削除 */
+  const onCharacterRemove = useCallback(
+    (idx: number) => {
+      form.removeListItem("characters", idx);
+    },
+    [form]
+  );
+
+  const nextPlaceSort = useNextSort(form.values.places);
+  /** 場所追加 */
+  const onPlaceInsert = useCallback(() => {
+    form.insertListItem("places", {
+      id: uuidv4(),
+      name: "",
+      memo: "",
+      sort: nextPlaceSort,
+    });
+  }, [form]);
+
+  /** 場所削除 */
+  const onPlaceRemove = useCallback(
+    (idx: number) => {
+      form.removeListItem("places", idx);
+    },
+    [form]
+  );
+
+  /** 設定更新 */
   const handleSubmit = useCallback(
     (values: TimelineConfig) => {
       dispatch(timelineSlice.actions.updateConfig(values));
@@ -58,5 +101,13 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
     [dispatch, onClose]
   );
 
-  return { form, presets, handleSubmit };
+  return {
+    form,
+    presets,
+    handleSubmit,
+    onCharacterInsert,
+    onCharacterRemove,
+    onPlaceInsert,
+    onPlaceRemove,
+  };
 };

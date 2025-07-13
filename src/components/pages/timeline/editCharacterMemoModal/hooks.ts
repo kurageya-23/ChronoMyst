@@ -17,7 +17,7 @@ export const useEditCharacterMemoModal = (
   // 初期値を設定（基本的に選択されたキャラクターのIDと既存のメモが反映される）
   const initialValues = useMemo<EditCharacterMemoFormData>(
     () => ({
-      selectedCharacterId: selectedCharacter?.id ?? 0,
+      selectedCharacterId: selectedCharacter?.id ?? "",
       memo: selectedCharacter?.memo ?? "",
     }),
     [selectedCharacter]

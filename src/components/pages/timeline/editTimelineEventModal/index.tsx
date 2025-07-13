@@ -139,7 +139,7 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
             >
               <Group gap="xs" wrap="wrap">
                 {config.characters.map((c) => (
-                  <Chip key={String(c.id)} value={String(c.id)} color={c.color}>
+                  <Chip key={c.id} value={c.id} color={c.color}>
                     {c.name}
                   </Chip>
                 ))}
@@ -157,7 +157,7 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
             label="場所"
             multiple={false}
             data={config.places.map((p) => ({
-              value: String(p.id),
+              value: p.id,
               label: p.name,
               color: p.color,
             }))}

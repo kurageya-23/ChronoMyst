@@ -10,19 +10,21 @@ export type Scenario = {
 
 // キャラクター
 export type Character = {
-  id: number;
+  id: string;
   name: string;
   playerName: string;
   color: string;
   memo: string;
+  sort: number;
 };
 
 // 場所
 export type Place = {
-  id: number;
+  id: string;
   name: string;
   color: string;
   memo: string;
+  sort: number;
 };
 
 // 出来事
@@ -66,7 +68,7 @@ export type TimelineEventFormData = {
 
 /** キャラクターメモ専用データ定義 */
 export type EditCharacterMemoFormData = {
-  selectedCharacterId: number;
+  selectedCharacterId: string;
   memo: string;
 };
 
@@ -135,10 +137,10 @@ export const calendarToForm = (event: EventApi): TimelineEventFormData => {
     detail: event.title,
     color: event.backgroundColor,
     characterIds: ((event.extendedProps.characters as Character[]) ?? []).map(
-      (c) => String(c.id)
+      (c) => c.id
     ),
     characters: (event.extendedProps.characters as Character[]) ?? [],
-    placeId: String((event.extendedProps.place as Place)?.id ?? ""),
+    placeId: (event.extendedProps.place as Place)?.id ?? "",
     place: event.extendedProps.place as Place,
   };
 };
@@ -169,9 +171,7 @@ export const solveTimelineEvent = (
         config.characters.find((c: Character) => String(c.id) === id)!
     )
     .filter(Boolean);
-  const place = config.places.find(
-    (p: Place) => String(p.id) === values.placeId
-  )!;
+  const place = config.places.find((p: Place) => p.id === values.placeId)!;
   return { ...values, characters, place };
 };
 
@@ -190,31 +190,34 @@ export const assignTimelineEventId = (
 // キャラクターデータのサンプル
 export const charactersSample = [
   {
-    id: 1,
+    id: "1",
     name: "キャラクターA",
     playerName: "プレイヤーA",
     memo: "つよそう",
     color: "#fa5252",
+    sort: 1,
   } as Character,
   {
-    id: 2,
+    id: "2",
     name: "キャラクターB",
     playerName: "プレイヤーB",
     memo: "よわそう",
     color: "#fa5252",
+    sort: 2,
   } as Character,
   {
-    id: 3,
+    id: "3",
     name: "キャラクターC",
     playerName: "プレイヤーC",
     memo: "かわいい",
     color: "#fa5252",
+    sort: 3,
   } as Character,
 ];
 
 // 場所データのサンプル
 export const placesSample = [
-  { id: 1, name: "エントランス", memo: "" } as Place,
-  { id: 2, name: "調理室", memo: "" } as Place,
-  { id: 3, name: "倉庫", memo: "" } as Place,
+  { id: "1", name: "エントランス", memo: "", sort: 1 } as Place,
+  { id: "2", name: "調理室", memo: "", sort: 2 } as Place,
+  { id: "3", name: "倉庫", memo: "", sort: 3 } as Place,
 ];
