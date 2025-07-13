@@ -71,3 +71,8 @@
 .character-timeline .fc-timegrid-slot-lane:hover {
   background-color: rgba(0, 123, 255, 0.1);
 }
+
+/** イベント */
+.character-timeline .fc-event-main {
+  overflow: hidden; /** メモがイベントの領域をはみださないように */
+}

@@ -65,6 +65,7 @@ export const useTimeline = (config: Timeline["config"]) => {
     setSelectedEvent({
       startTime: info.date.toTimeString().slice(0, 5),
       endTime: addMinutes(info.date, intervalMin).toTimeString().slice(0, 5),
+      detail: "",
       characterIds: [charcter.id],
       color: COLOR_EVENT_DEFAULT,
     } as TimelineEventFormData);
