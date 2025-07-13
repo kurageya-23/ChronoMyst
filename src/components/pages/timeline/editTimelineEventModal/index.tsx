@@ -120,8 +120,18 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
           {/* 開始時間、終了時間 */}
           <TimeRangePicker times={times} form={form} />
 
-          {/* メモ */}
-          <TextareaInput form={form} />
+          {/* 証言者 */}
+          <ListChipSelector
+            label="証言者"
+            multiple={false}
+            data={config.witnesses.map((w) => ({
+              value: w.id,
+              label: w.name,
+              color: w.color,
+            }))}
+            value={form.values.witnessId}
+            onChange={(v) => form.setFieldValue("witnessId", v as string)}
+          />
 
           {/* 関係者 */}
           <Stack gap={0}>
@@ -160,6 +170,10 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
             value={form.values.placeId}
             onChange={(v) => form.setFieldValue("placeId", v as string)}
           />
+
+          {/* メモ */}
+          <TextareaInput form={form} />
+
           <ColorInput
             label="カラー"
             swatches={COLOR_SET}

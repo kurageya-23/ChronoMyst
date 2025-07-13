@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { getTimeRange, isTimeAfter } from "@mantine/dates";
 import { timelineSlice } from "../../../../features/timelines/timelineSlice";
 import type { RootState } from "../../../../app/store";
-import type { TimelineConfig } from "../../../../features/models";
+import { npcSample, type TimelineConfig } from "../../../../features/models";
 import { configModalValidator } from "./validator";
 import { v4 as uuidv4 } from "uuid";
 import { useNextSort } from "../../../../features/utils/useNextSort";
@@ -20,6 +20,7 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
       interval: config.interval,
       startTime: config.startTime,
       endTime: config.endTime,
+      witnesses: config.characters.map((c) => ({ ...c })),
       characters: config.characters.map((c) => ({ ...c })),
       places: config.places.map((p) => ({ ...p })),
     }),
@@ -95,6 +96,8 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
   /** 設定更新 */
   const handleSubmit = useCallback(
     (values: TimelineConfig) => {
+      // 証言者にはキャラクター+NPCを追加
+      values.witnesses = values.characters.concat([npcSample]);
       dispatch(timelineSlice.actions.updateConfig(values));
       onClose();
     },

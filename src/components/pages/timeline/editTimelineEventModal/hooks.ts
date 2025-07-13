@@ -8,6 +8,7 @@ import {
   type TimelineEventFormData,
   solveTimelineEvent,
   assignTimelineEventId,
+  type Character,
 } from "../../../../features/models";
 import { COLOR_EVENT_DEFAULT } from "../../../../app/appConstants";
 
@@ -31,6 +32,8 @@ export const useTimelineEvent = (
       endTime: "",
       detail: "",
       color: COLOR_EVENT_DEFAULT,
+      witnessId: "",
+      witness: {} as Character,
       characterIds: [],
       characters: [],
       placeId: "",
