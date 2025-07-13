@@ -8,11 +8,16 @@ import {
   type TimelineEvent,
   type TimelineEventFormData,
 } from "../../../features/models";
-import { type EventApi, type EventDropArg } from "@fullcalendar/core";
-import { type EventResizeDoneArg } from "@fullcalendar/interaction";
+import { type EventDropArg } from "@fullcalendar/core";
+import {
+  type DateClickArg,
+  type EventResizeDoneArg,
+} from "@fullcalendar/interaction";
 import { useDispatch } from "react-redux";
 import { timelineSlice } from "../../../features/timelines/timelineSlice";
 import { useDisclosure } from "@mantine/hooks";
+import { addMinutes, toMinute } from "../../../app/util";
+import { COLOR_EVENT_DEFAULT } from "../../../app/appConstants";
 
 /**
  * カスタムフック
@@ -53,8 +58,22 @@ export const useTimeline = (config: Timeline["config"]) => {
     dispatch(timelineSlice.actions.updateTimelineEvent(timelineEvent));
   };
 
+  /** タイムライン上の直接クリックイベントハンドラ */
+  const handleClickTimeline = (info: DateClickArg, charcter: Character) => {
+    // 開始時間はクリック箇所、終了時間は開始時間 + 時間間隔
+    const intervalMin = toMinute(config.interval);
+    setSelectedEvent({
+      startTime: info.date.toTimeString().slice(0, 5),
+      endTime: addMinutes(info.date, intervalMin).toTimeString().slice(0, 5),
+      characterIds: [charcter.id],
+      color: COLOR_EVENT_DEFAULT,
+    } as TimelineEventFormData);
+    EditTimelineEventOpen();
+  };
+
   /** イベント編集モーダル */
-  const [selectedEvent, setSelectedEvent] = useState<EventApi | null>(null);
+  const [selectedEvent, setSelectedEvent] =
+    useState<TimelineEventFormData | null>(null);
   const [
     isEditTimelineEventModalOpen,
     { open: EditTimelineEventOpen, close: EditTimelineEventClose },
@@ -82,6 +101,7 @@ export const useTimeline = (config: Timeline["config"]) => {
     finalizeTimelineEvent,
     handleEventDrop,
     handleEventResize,
+    handleClickTimeline,
     // イベント編集モーダル
     selectedEvent,
     setSelectedEvent,

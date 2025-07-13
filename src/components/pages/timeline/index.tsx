@@ -3,9 +3,11 @@ import { ActionIcon, Affix, Group, Text, Tooltip } from "@mantine/core";
 import { IconNotebook, IconPlus } from "@tabler/icons-react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
-import interactionPlugin from "@fullcalendar/interaction";
+import interactionPlugin, {
+  type DateClickArg,
+} from "@fullcalendar/interaction";
 import { useSelector } from "react-redux";
-import { type Timeline } from "../../../features/models";
+import { calendarToForm, type Timeline } from "../../../features/models";
 import { timelineSlice } from "../../../features/timelines/timelineSlice";
 import CustomTimelineEvent from "../../CustomTimelineEvent";
 import type { RootState } from "../../../app/store";
@@ -31,6 +33,7 @@ function TimelinePage() {
   const {
     handleEventDrop,
     handleEventResize,
+    handleClickTimeline,
     selectedEvent,
     setSelectedEvent,
     isEditTimelineEventModalOpen,
@@ -160,8 +163,11 @@ function TimelinePage() {
                     events={filteredEvents}
                     eventClick={(info) => {
                       info.jsEvent.preventDefault();
-                      setSelectedEvent(info.event);
+                      setSelectedEvent(calendarToForm(info.event));
                       EditTimelineEventOpen();
+                    }}
+                    dateClick={(args: DateClickArg) => {
+                      handleClickTimeline(args, c);
                     }}
                     slotLabelInterval={config.interval}
                     slotDuration={config.interval}

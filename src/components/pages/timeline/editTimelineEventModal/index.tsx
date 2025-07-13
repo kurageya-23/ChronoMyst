@@ -20,7 +20,6 @@ import {
   timelineSlice,
 } from "../../../../features/timelines/timelineSlice";
 import { COLOR_SET } from "../../../../app/appConstants";
-import { type EventApi } from "@fullcalendar/core";
 import { useTimelineEvent } from "./hooks";
 import { editEventModalValidator } from "./validator";
 import type { TimelineEventFormData } from "../../../../features/models";
@@ -28,7 +27,7 @@ import type { TimelineEventFormData } from "../../../../features/models";
 export type EditTimelineEventModalProps = {
   opened: boolean;
   onClose: () => void;
-  selectedEvent: EventApi | null;
+  selectedEvent: TimelineEventFormData | null;
 };
 /** イベント登録・編集モーダル */
 export default function EditTimelineEventModal({
@@ -67,11 +66,8 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
   const times = useSelector(selectTimes);
 
   // カスタムフックからロジックを取得
-  const {
-    initialValues,
-    buildPayload,
-    finalizeTimelineEvent: finalizeTimelineEvent,
-  } = useTimelineEvent(selectedEvent, config);
+  const { initialValues, buildPayload, finalizeTimelineEvent } =
+    useTimelineEvent(selectedEvent, config);
 
   // フォームデータ
   const form = useForm<TimelineEventFormData>({
@@ -92,9 +88,9 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
 
   const handleSubmit = (values: typeof form.values) => {
     const mapped = buildPayload(values);
-    const timelineEvent = finalizeTimelineEvent(mapped, !selectedEvent);
+    const timelineEvent = finalizeTimelineEvent(mapped, !selectedEvent?.id);
 
-    if (selectedEvent) {
+    if (selectedEvent?.id) {
       dispatch(timelineSlice.actions.updateTimelineEvent(timelineEvent));
     } else {
       dispatch(timelineSlice.actions.createTimelineEvent(timelineEvent));
@@ -170,7 +166,7 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
             disallowInput
             {...form.getInputProps("color")}
           />
-          {selectedEvent ? (
+          {selectedEvent?.id ? (
             <Group justify="space-between" mt="md">
               <Button color="red" onClick={handleDelete}>
                 削除
