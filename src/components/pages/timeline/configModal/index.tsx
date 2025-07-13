@@ -32,7 +32,15 @@ export type ConfigModalProps = {
 };
 
 const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
-  const { form, presets, handleSubmit } = useTimelineConfig(opened, onClose);
+  const {
+    form,
+    presets,
+    handleSubmit,
+    onCharacterInsert,
+    onCharacterRemove,
+    onPlaceInsert,
+    onPlaceRemove,
+  } = useTimelineConfig(opened, onClose);
 
   return (
     <Modal
@@ -94,17 +102,8 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
                 min={CHARACTER_MIN_COUNT}
                 max={CHARACTER_MAX_COUNT}
                 errorMessage={form.errors.characters?.toString()}
-                onInsert={() => {
-                  form.insertListItem("characters", {
-                    name: "",
-                    playerName: "",
-                    color: "#228be6",
-                    memo: "",
-                  });
-                }}
-                onRemove={(i) => {
-                  form.removeListItem("characters", i);
-                }}
+                onInsert={onCharacterInsert}
+                onRemove={(i) => onCharacterRemove(i)}
                 renderItem={(c, i) => (
                   <>
                     <Text size="sm">{i + 1}.</Text>
@@ -140,10 +139,8 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
                 min={PLACE_MIN_COUNT}
                 max={PLACE_MAX_COUNT}
                 errorMessage={form.errors.places?.toString()}
-                onInsert={() =>
-                  form.insertListItem("places", { name: "", memo: "" })
-                }
-                onRemove={(i) => form.removeListItem("places", i)}
+                onInsert={onPlaceInsert}
+                onRemove={(i) => onPlaceRemove(i)}
                 renderItem={(_, i) => (
                   <>
                     <Text size="sm">{i + 1}.</Text>

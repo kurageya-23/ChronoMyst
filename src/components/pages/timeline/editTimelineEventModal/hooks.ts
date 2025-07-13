@@ -1,16 +1,16 @@
 // src/hooks/useTimelineEvent.ts
 import { useMemo, useCallback } from "react";
-import type { EventApi } from "@fullcalendar/core";
 
 import {
   type Place,
   type TimelineEvent,
   type Timeline,
   type TimelineEventFormData,
-  calendarToForm,
   solveTimelineEvent,
   assignTimelineEventId,
+  type Character,
 } from "../../../../features/models";
+import { COLOR_EVENT_DEFAULT } from "../../../../app/appConstants";
 
 /**
  * カスタムフック
@@ -18,25 +18,27 @@ import {
  * @param config Timeline.config（characters, places 等）
  */
 export const useTimelineEvent = (
-  event: EventApi | null,
+  event: TimelineEventFormData | null,
   config: Timeline["config"]
 ) => {
   // 1. 初期値をメモ化
   const initialValues: TimelineEventFormData = useMemo(() => {
-    if (!event) {
-      return {
-        id: "",
-        startTime: "",
-        endTime: "",
-        detail: "",
-        color: "#868e96",
-        characterIds: [],
-        characters: [],
-        placeId: "",
-        place: {} as Place,
-      };
-    }
-    return calendarToForm(event);
+    if (event?.id) return event;
+    if (event?.startTime) return event;
+
+    return {
+      id: "",
+      startTime: "",
+      endTime: "",
+      detail: "",
+      color: COLOR_EVENT_DEFAULT,
+      witnessId: "",
+      witness: {} as Character,
+      characterIds: [],
+      characters: [],
+      placeId: "",
+      place: {} as Place,
+    };
   }, [event]);
 
   // 2. フォーム送信前にキャラクターと場所を解決
@@ -58,6 +60,6 @@ export const useTimelineEvent = (
   return {
     initialValues,
     buildPayload,
-    finalizeTimelineEvent: finalizeTimelineEvent,
+    finalizeTimelineEvent,
   };
 };

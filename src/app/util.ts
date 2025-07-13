@@ -10,3 +10,14 @@ export const getTodayString = () => {
 /** ファイル名に使えない文字を _ に置換 */
 export const sanitizeFilename = (name: string) =>
   name.replace(/[/\\?%*:|"<> ]/g, "_");
+
+/** "hh:ss"から分を算出（検証なし） */
+export const toMinute = (timeStr: string) => {
+  const [ih, im] = timeStr.split(":").map(Number);
+  return ih * 60 + im;
+};
+
+/** 日付に分を足し合わせる */
+export const addMinutes = (date: Date, min: number): Date => {
+  return new Date(date.getTime() + min * 60 * 1000);
+};

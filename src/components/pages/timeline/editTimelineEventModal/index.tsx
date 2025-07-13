@@ -20,7 +20,6 @@ import {
   timelineSlice,
 } from "../../../../features/timelines/timelineSlice";
 import { COLOR_SET } from "../../../../app/appConstants";
-import { type EventApi } from "@fullcalendar/core";
 import { useTimelineEvent } from "./hooks";
 import { editEventModalValidator } from "./validator";
 import type { TimelineEventFormData } from "../../../../features/models";
@@ -28,7 +27,7 @@ import type { TimelineEventFormData } from "../../../../features/models";
 export type EditTimelineEventModalProps = {
   opened: boolean;
   onClose: () => void;
-  selectedEvent: EventApi | null;
+  selectedEvent: TimelineEventFormData | null;
 };
 /** イベント登録・編集モーダル */
 export default function EditTimelineEventModal({
@@ -67,11 +66,8 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
   const times = useSelector(selectTimes);
 
   // カスタムフックからロジックを取得
-  const {
-    initialValues,
-    buildPayload,
-    finalizeTimelineEvent: finalizeTimelineEvent,
-  } = useTimelineEvent(selectedEvent, config);
+  const { initialValues, buildPayload, finalizeTimelineEvent } =
+    useTimelineEvent(selectedEvent, config);
 
   // フォームデータ
   const form = useForm<TimelineEventFormData>({
@@ -92,9 +88,9 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
 
   const handleSubmit = (values: typeof form.values) => {
     const mapped = buildPayload(values);
-    const timelineEvent = finalizeTimelineEvent(mapped, !selectedEvent);
+    const timelineEvent = finalizeTimelineEvent(mapped, !selectedEvent?.id);
 
-    if (selectedEvent) {
+    if (selectedEvent?.id) {
       dispatch(timelineSlice.actions.updateTimelineEvent(timelineEvent));
     } else {
       dispatch(timelineSlice.actions.createTimelineEvent(timelineEvent));
@@ -124,8 +120,18 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
           {/* 開始時間、終了時間 */}
           <TimeRangePicker times={times} form={form} />
 
-          {/* メモ */}
-          <TextareaInput form={form} />
+          {/* 証言者 */}
+          <ListChipSelector
+            label="証言者"
+            multiple={false}
+            data={config.witnesses.map((w) => ({
+              value: w.id,
+              label: w.name,
+              color: w.color,
+            }))}
+            value={form.values.witnessId}
+            onChange={(v) => form.setFieldValue("witnessId", v as string)}
+          />
 
           {/* 関係者 */}
           <Stack gap={0}>
@@ -139,7 +145,7 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
             >
               <Group gap="xs" wrap="wrap">
                 {config.characters.map((c) => (
-                  <Chip key={String(c.id)} value={String(c.id)} color={c.color}>
+                  <Chip key={c.id} value={c.id} color={c.color}>
                     {c.name}
                   </Chip>
                 ))}
@@ -157,20 +163,24 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
             label="場所"
             multiple={false}
             data={config.places.map((p) => ({
-              value: String(p.id),
+              value: p.id,
               label: p.name,
               color: p.color,
             }))}
             value={form.values.placeId}
             onChange={(v) => form.setFieldValue("placeId", v as string)}
           />
+
+          {/* メモ */}
+          <TextareaInput form={form} />
+
           <ColorInput
             label="カラー"
             swatches={COLOR_SET}
             disallowInput
             {...form.getInputProps("color")}
           />
-          {selectedEvent ? (
+          {selectedEvent?.id ? (
             <Group justify="space-between" mt="md">
               <Button color="red" onClick={handleDelete}>
                 削除

@@ -1,24 +1,3 @@
-/* 一番左のFullCalendarは時間軸だけを表示する */
-.axis-only .fc-timegrid-cols {
-  display: none !important;
-}
-
-.axis-only .fc-scrollgrid-sync-table {
-  width: 0 !important;
-}
-
-.axis-only .fc-timegrid-body > table {
-  width: 0 !important;
-}
-
-.axis-only .fc-timegrid-slot-lane {
-  display: none !important;
-}
-
-.fc .fc-timegrid-slot {
-  height: 50px;
-}
-
 /* タイムラインテーブルの設定 */
 .timeline-container {
   width: 100%;
@@ -53,4 +32,47 @@
   position: sticky;
   left: 0;
   z-index: 2;
+}
+
+.fc .fc-timegrid-slot {
+  height: 50px;
+}
+
+/* 一番左のFullCalendarは時間軸だけを表示する */
+.axis-only .fc-timegrid-cols {
+  display: none !important;
+}
+
+.axis-only .fc-scrollgrid-sync-table {
+  width: 0 !important;
+}
+
+.axis-only .fc-timegrid-body > table {
+  width: 0 !important;
+}
+
+.axis-only .fc-timegrid-slot-lane {
+  display: none !important;
+}
+
+/** 時間軸のラベル */
+.axis-only .fc .fc-timegrid-slot-label {
+  vertical-align: top;
+  font-size: 14px;
+}
+
+/** 各キャラクターのFullCalendarコンテナ */
+/* pointer を強制 */
+.character-timeline .fc {
+  cursor: pointer !important;
+}
+
+/** マウスカーソルが当たっている部分のみハイライト */
+.character-timeline .fc-timegrid-slot-lane:hover {
+  background-color: rgba(0, 123, 255, 0.1);
+}
+
+/** イベント */
+.character-timeline .fc-event-main {
+  overflow: hidden; /** メモがイベントの領域をはみださないように */
 }

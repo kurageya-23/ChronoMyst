@@ -10,19 +10,21 @@ export type Scenario = {
 
 // キャラクター
 export type Character = {
-  id: number;
+  id: string;
   name: string;
   playerName: string;
   color: string;
   memo: string;
+  sort: number;
 };
 
 // 場所
 export type Place = {
-  id: number;
+  id: string;
   name: string;
   color: string;
   memo: string;
+  sort: number;
 };
 
 // 出来事
@@ -58,6 +60,8 @@ export type TimelineEventFormData = {
   endTime?: string;
   placeId: string;
   place: Place;
+  witnessId: string;
+  witness: Character;
   characterIds: string[];
   characters: Character[];
   color: string;
@@ -66,12 +70,13 @@ export type TimelineEventFormData = {
 
 /** キャラクターメモ専用データ定義 */
 export type EditCharacterMemoFormData = {
-  selectedCharacterId: number;
+  selectedCharacterId: string;
   memo: string;
 };
 
 // カレンダーイベントの拡張プロパティ
 export type ExtendedCalenderEventProp = {
+  witness: Character;
   characters: Character[];
   place?: Place;
 };
@@ -81,6 +86,7 @@ export type TimelineConfig = {
   interval: string;
   startTime: string;
   endTime: string;
+  witnesses: Character[];
   characters: Character[];
   places: Place[];
 };
@@ -134,11 +140,13 @@ export const calendarToForm = (event: EventApi): TimelineEventFormData => {
     endTime: event.endStr ? isoToHM(event.endStr) : "",
     detail: event.title,
     color: event.backgroundColor,
+    witnessId: (event.extendedProps.witness as Character)?.id ?? "",
+    witness: event.extendedProps.witness as Character,
     characterIds: ((event.extendedProps.characters as Character[]) ?? []).map(
-      (c) => String(c.id)
+      (c) => c.id
     ),
     characters: (event.extendedProps.characters as Character[]) ?? [],
-    placeId: String((event.extendedProps.place as Place)?.id ?? ""),
+    placeId: (event.extendedProps.place as Place)?.id ?? "",
     place: event.extendedProps.place as Place,
   };
 };
@@ -153,26 +161,28 @@ export const formToCalendar = (form: TimelineEventFormData) =>
     borderColor: form.color,
     backgroundColor: form.color,
     extendedProps: {
+      witness: form.witness,
       characters: form.characters,
       place: form.place,
     },
   } as TimelineEvent);
 
-/** キャラクターと場所を解決 */
+/** 証言者、関係者、場所を解決 */
 export const solveTimelineEvent = (
   values: TimelineEventFormData,
   config: TimelineConfig
 ): TimelineEventFormData => {
+  const witness = config.witnesses.find(
+    (w: Character) => w.id === values.witnessId
+  )!;
   const characters = values.characterIds
     .map(
       (id: string) =>
         config.characters.find((c: Character) => String(c.id) === id)!
     )
     .filter(Boolean);
-  const place = config.places.find(
-    (p: Place) => String(p.id) === values.placeId
-  )!;
-  return { ...values, characters, place };
+  const place = config.places.find((p: Place) => p.id === values.placeId)!;
+  return { ...values, witness, characters, place };
 };
 
 export const assignTimelineEventId = (
@@ -190,31 +200,45 @@ export const assignTimelineEventId = (
 // キャラクターデータのサンプル
 export const charactersSample = [
   {
-    id: 1,
+    id: "1",
     name: "キャラクターA",
     playerName: "プレイヤーA",
     memo: "つよそう",
     color: "#fa5252",
+    sort: 1,
   } as Character,
   {
-    id: 2,
+    id: "2",
     name: "キャラクターB",
     playerName: "プレイヤーB",
     memo: "よわそう",
     color: "#fa5252",
+    sort: 2,
   } as Character,
   {
-    id: 3,
+    id: "3",
     name: "キャラクターC",
     playerName: "プレイヤーC",
     memo: "かわいい",
     color: "#fa5252",
+    sort: 3,
   } as Character,
 ];
 
 // 場所データのサンプル
 export const placesSample = [
-  { id: 1, name: "エントランス", memo: "" } as Place,
-  { id: 2, name: "調理室", memo: "" } as Place,
-  { id: 3, name: "倉庫", memo: "" } as Place,
+  { id: "1", name: "エントランス", memo: "", sort: 1 } as Place,
+  { id: "2", name: "調理室", memo: "", sort: 2 } as Place,
+  { id: "3", name: "倉庫", memo: "", sort: 3 } as Place,
 ];
+
+// NPCデータのサンプル
+export const npcSample = {
+  id: "character-npc",
+  name: "NPC",
+  color: "#868e96",
+  sort: 99,
+} as Character;
+
+// 証言者データのサンプル
+export const witnessesSample = charactersSample.concat(npcSample);

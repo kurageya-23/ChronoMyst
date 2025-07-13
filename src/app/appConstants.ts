@@ -18,6 +18,9 @@ export const COLOR_SET = [
   "#fd7e14",
 ];
 
+/** イベントのデフォルトカラー */
+export const COLOR_EVENT_DEFAULT = "#868e96";
+
 /** 時間間隔のプリセット */
 export const INTERVAL_PRESETS = ["00:10", "00:15", "00:30", "01:00", "02:00"];
 

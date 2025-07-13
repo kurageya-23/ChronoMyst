@@ -8,6 +8,7 @@ import {
   type Timeline,
   type TimelineConfig,
   type EditCharacterMemoFormData,
+  witnessesSample,
 } from "../models";
 import type { RootState } from "../../app/store";
 
@@ -22,6 +23,7 @@ const initialTimeline: Timeline = {
     interval: "01:00",
     startTime: "18:00",
     endTime: "23:00",
+    witnesses: witnessesSample,
     characters: charactersSample,
     places: placesSample,
   } as TimelineConfig,
