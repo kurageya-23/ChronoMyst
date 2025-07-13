@@ -123,6 +123,8 @@ function TimelinePage() {
                   const minute = String(date.getMinutes()).padStart(2, "0");
                   return `${hour}:${minute}`;
                 }}
+                slotLabelInterval={config.interval}
+                slotDuration={config.interval}
                 slotMinTime={config.startTime}
                 slotMaxTime={config.endTime}
                 scrollTime={config.startTime}
@@ -161,6 +163,8 @@ function TimelinePage() {
                       setSelectedEvent(info.event);
                       EditTimelineEventOpen();
                     }}
+                    slotLabelInterval={config.interval}
+                    slotDuration={config.interval}
                     editable
                     eventDrop={handleEventDrop}
                     eventResize={handleEventResize}
