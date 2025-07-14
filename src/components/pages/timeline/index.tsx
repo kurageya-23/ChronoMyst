@@ -1,6 +1,6 @@
 import "./style.css";
-import { ActionIcon, Affix, Group, Text, Tooltip } from "@mantine/core";
-import { IconNotebook, IconPlus } from "@tabler/icons-react";
+import { ActionIcon, Group, Stack, Text, Tooltip } from "@mantine/core";
+import { IconNotebook } from "@tabler/icons-react";
 import FullCalendar from "@fullcalendar/react";
 import timeGridPlugin from "@fullcalendar/timegrid";
 import interactionPlugin, {
@@ -34,6 +34,8 @@ function TimelinePage() {
     handleEventDrop,
     handleEventResize,
     handleClickTimeline,
+    calendarSlotMinTime,
+    calendarSlotMaxTime,
     selectedEvent,
     setSelectedEvent,
     isEditTimelineEventModalOpen,
@@ -44,6 +46,7 @@ function TimelinePage() {
     isEditCharacterMemoModalOpen,
     EditCharacterMemoModalOpen,
     handleEditCharacterMemoClose,
+    getInitialDate,
   } = useTimeline(config);
 
   return (
@@ -85,7 +88,6 @@ function TimelinePage() {
                     aria-label="Settings"
                     onClick={() => {
                       setSelectedCharacter(c);
-                      console.log(c, selectedCharacter);
                       EditCharacterMemoModalOpen();
                     }}
                   >
@@ -111,28 +113,39 @@ function TimelinePage() {
           <tr>
             {/* --- 時間軸だけの FullCalendar --- */}
             <td style={{ height: "100%" }} className="axis-only">
-              <FullCalendar
-                plugins={[timeGridPlugin]}
-                initialView="timeGridDay"
-                locale="en"
-                allDaySlot={false}
-                dayHeaders={false}
-                headerToolbar={false}
-                dayHeaderContent={() => null}
-                contentHeight="auto"
-                slotLabelContent={(arg) => {
-                  const date = arg.date;
-                  const hour = date.getHours();
-                  const minute = String(date.getMinutes()).padStart(2, "0");
-                  return `${hour}:${minute}`;
-                }}
-                slotLabelInterval={config.interval}
-                slotDuration={config.interval}
-                slotMinTime={config.startTime}
-                slotMaxTime={config.endTime}
-                scrollTime={config.startTime}
-                events={[]}
-              />
+              <Stack gap={0}>
+                {Array.from({ length: config.days }, (_, i) => {
+                  return (
+                    <FullCalendar
+                      key={i}
+                      plugins={[timeGridPlugin]}
+                      initialView="timeGridDay"
+                      locale="en"
+                      initialDate={getInitialDate(i)}
+                      allDaySlot={false}
+                      dayHeaders={false}
+                      headerToolbar={false}
+                      dayHeaderContent={() => null}
+                      contentHeight="auto"
+                      slotLabelContent={(arg) => {
+                        const date = arg.date;
+                        const hour = date.getHours();
+                        const minute = String(date.getMinutes()).padStart(
+                          2,
+                          "0"
+                        );
+                        return `${hour}:${minute}`;
+                      }}
+                      slotLabelInterval={config.interval}
+                      slotDuration={config.interval}
+                      slotMinTime={calendarSlotMinTime(i)}
+                      slotMaxTime={calendarSlotMaxTime(i)}
+                      scrollTime={config.startTime}
+                      events={[]}
+                    />
+                  );
+                })}
+              </Stack>
             </td>
 
             {/* --- 各キャラクターごとの FullCalendar --- */}
@@ -146,59 +159,50 @@ function TimelinePage() {
                   style={{ height: "100%" }}
                   className="character-timeline"
                 >
-                  <FullCalendar
-                    plugins={[timeGridPlugin, interactionPlugin]}
-                    initialView="timeGridDay"
-                    locale="ja"
-                    allDaySlot={false}
-                    dayHeaders={false}
-                    headerToolbar={false}
-                    dayHeaderContent={() => null}
-                    contentHeight="auto"
-                    slotLabelContent={() => null}
-                    slotMinTime={config.startTime}
-                    slotMaxTime={config.endTime}
-                    scrollTime={config.startTime}
-                    eventContent={CustomTimelineEvent}
-                    events={filteredEvents}
-                    eventClick={(info) => {
-                      info.jsEvent.preventDefault();
-                      setSelectedEvent(calendarToForm(info.event));
-                      EditTimelineEventOpen();
-                    }}
-                    dateClick={(args: DateClickArg) => {
-                      handleClickTimeline(args, c);
-                    }}
-                    slotLabelInterval={config.interval}
-                    slotDuration={config.interval}
-                    editable
-                    eventDrop={handleEventDrop}
-                    eventResize={handleEventResize}
-                    eventMinHeight={50}
-                  />
+                  <Stack gap={0}>
+                    {Array.from({ length: config.days }, (_, i) => {
+                      return (
+                        <FullCalendar
+                          key={i}
+                          plugins={[timeGridPlugin, interactionPlugin]}
+                          initialView="timeGridDay"
+                          locale="ja"
+                          initialDate={getInitialDate(i)}
+                          allDaySlot={false}
+                          dayHeaders={false}
+                          headerToolbar={false}
+                          dayHeaderContent={() => null}
+                          contentHeight="auto"
+                          slotLabelContent={() => null}
+                          slotMinTime={calendarSlotMinTime(i)}
+                          slotMaxTime={calendarSlotMaxTime(i)}
+                          scrollTime={config.startTime}
+                          eventContent={CustomTimelineEvent}
+                          events={filteredEvents}
+                          eventClick={(info) => {
+                            info.jsEvent.preventDefault();
+                            setSelectedEvent(calendarToForm(info.event));
+                            EditTimelineEventOpen();
+                          }}
+                          dateClick={(args: DateClickArg) => {
+                            handleClickTimeline(args, c, i);
+                          }}
+                          slotLabelInterval={config.interval}
+                          slotDuration={config.interval}
+                          editable
+                          eventDrop={handleEventDrop}
+                          eventResize={handleEventResize}
+                          eventMinHeight={50}
+                        />
+                      );
+                    })}
+                  </Stack>
                 </td>
               );
             })}
           </tr>
         </tbody>
       </table>
-
-      {/* イベント登録フロートボタン */}
-      <Affix position={{ bottom: 40, right: 40 }}>
-        <Group>
-          <Text size="sm" color="white">
-            イベントの登録
-          </Text>
-          <ActionIcon
-            color="blue"
-            radius="xl"
-            size="lg"
-            onClick={EditTimelineEventOpen}
-          >
-            <IconPlus stroke={1.5} size={32} />
-          </ActionIcon>
-        </Group>
-      </Affix>
 
       {/* イベント登録モーダル */}
       <EditTimelineEventModal

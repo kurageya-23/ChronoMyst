@@ -30,6 +30,7 @@ export const useTimelineEvent = (
       id: "",
       startTime: "",
       endTime: "",
+      days: "1",
       detail: "",
       color: COLOR_EVENT_DEFAULT,
       witnessId: "",
@@ -57,9 +58,58 @@ export const useTimelineEvent = (
     []
   );
 
+  /** 開始時間、終了時間TimeInputのプリセットを生成 */
+  const getTimePresets = (days: number) => {
+    const toMinutes = (hm: string) => {
+      const [h, m] = hm.split(":").map(Number);
+      return h * 60 + m;
+    };
+    const toHmString = (min: number) => {
+      const h = Math.floor(min / 60);
+      const m = min % 60;
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
+    };
+
+    const startMin = toMinutes(config.startTime);
+    const endMin = toMinutes(config.endTime);
+    const stepMin = toMinutes(config.interval);
+    const fullStart = toMinutes("00:00");
+    const fullEnd = toMinutes("24:00"); // 1440 分
+
+    const times: string[] = [];
+    // 1日表示 or 単一日モード
+    if (config.days <= 1) {
+      for (let t = startMin; t <= endMin; t += stepMin) {
+        times.push(toHmString(t));
+      }
+      return times;
+    }
+
+    // 複数日モード
+    if (days === 1) {
+      // 1日目: startTime → 24:00
+      for (let t = startMin; t <= fullEnd; t += stepMin) {
+        times.push(toHmString(t));
+      }
+    } else if (days === config.days) {
+      // 最終日: 00:00 → endTime
+      for (let t = fullStart; t <= endMin; t += stepMin) {
+        times.push(toHmString(t));
+      }
+    } else {
+      // 中間日: 00:00 → 24:00
+      for (let t = fullStart; t <= fullEnd; t += stepMin) {
+        times.push(toHmString(t));
+      }
+    }
+
+    return times;
+  };
+
   return {
     initialValues,
     buildPayload,
     finalizeTimelineEvent,
+    getTimePresets,
   };
 };

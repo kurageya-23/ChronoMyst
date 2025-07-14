@@ -1,4 +1,4 @@
-import { createSelector, type PayloadAction } from "@reduxjs/toolkit";
+import { type PayloadAction } from "@reduxjs/toolkit";
 import { createAppSlice } from "../../app/createAppSlice";
 import {
   charactersSample,
@@ -10,7 +10,6 @@ import {
   type EditCharacterMemoFormData,
   witnessesSample,
 } from "../models";
-import type { RootState } from "../../app/store";
 
 // Stateの初期化
 const initialTimeline: Timeline = {
@@ -21,8 +20,9 @@ const initialTimeline: Timeline = {
   timelineEvents: [],
   config: {
     interval: "01:00",
-    startTime: "18:00",
-    endTime: "23:00",
+    startTime: "18:00:00",
+    endTime: "23:00:00",
+    days: 1,
     witnesses: witnessesSample,
     characters: charactersSample,
     places: placesSample,
@@ -123,29 +123,3 @@ export const timelineSlice = createAppSlice({
     selectTimeline: (timeline) => timeline,
   },
 });
-
-/** 開始時間と終了時間と間隔から時間の選択肢を生成 */
-export const selectTimes = createSelector(
-  (state: RootState) => state[timelineSlice.reducerPath].config,
-  (config) => {
-    const toMinutes = (hm: string) => {
-      const [h, m] = hm.split(":").map(Number);
-      return h * 60 + m;
-    };
-    const toHmString = (min: number) => {
-      const h = Math.floor(min / 60);
-      const m = min % 60;
-      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-    };
-
-    const start = toMinutes(config.startTime);
-    const end = toMinutes(config.endTime);
-    const step = toMinutes(config.interval);
-
-    const arr: string[] = [];
-    for (let t = start; t <= end; t += step) {
-      arr.push(toHmString(t));
-    }
-    return arr;
-  }
-);
