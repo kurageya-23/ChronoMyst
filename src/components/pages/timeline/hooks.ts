@@ -92,7 +92,11 @@ export const useTimeline = (config: Timeline["config"]) => {
   };
 
   /** タイムライン上の直接クリックイベントハンドラ */
-  const handleClickTimeline = (info: DateClickArg, charcter: Character) => {
+  const handleClickTimeline = (
+    info: DateClickArg,
+    charcter: Character,
+    index: number
+  ) => {
     // 開始時間はクリック箇所、終了時間は開始時間 + 時間間隔
     const intervalMin = toMinute(config.interval);
     setSelectedEvent({
@@ -101,6 +105,7 @@ export const useTimeline = (config: Timeline["config"]) => {
       detail: "",
       characterIds: [charcter.id],
       color: COLOR_EVENT_DEFAULT,
+      days: String(index + 1),
     } as TimelineEventFormData);
     EditTimelineEventOpen();
   };
@@ -130,6 +135,13 @@ export const useTimeline = (config: Timeline["config"]) => {
     setSelectedCharacter(null);
   };
 
+  /** 本日からoffset分日付を加算して返す */
+  const getInitialDate = (offset: number) => {
+    const d = new Date();
+    d.setDate(d.getDate() + offset);
+    return d;
+  };
+
   return {
     buildPayload,
     finalizeTimelineEvent,
@@ -150,5 +162,6 @@ export const useTimeline = (config: Timeline["config"]) => {
     isEditCharacterMemoModalOpen,
     EditCharacterMemoModalOpen,
     handleEditCharacterMemoClose,
+    getInitialDate,
   };
 };

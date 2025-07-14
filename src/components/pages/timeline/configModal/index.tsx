@@ -77,7 +77,7 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
                   onChange={(event) => {
                     onChangeMultiDaysCheck(event.currentTarget.checked);
                   }}
-                  label="日をまたぐシナリオ"
+                  label="日をまたぐシナリオ(β)"
                   labelPosition="right"
                 />
 

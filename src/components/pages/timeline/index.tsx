@@ -46,6 +46,7 @@ function TimelinePage() {
     isEditCharacterMemoModalOpen,
     EditCharacterMemoModalOpen,
     handleEditCharacterMemoClose,
+    getInitialDate,
   } = useTimeline(config);
 
   return (
@@ -87,7 +88,6 @@ function TimelinePage() {
                     aria-label="Settings"
                     onClick={() => {
                       setSelectedCharacter(c);
-                      console.log(c, selectedCharacter);
                       EditCharacterMemoModalOpen();
                     }}
                   >
@@ -121,6 +121,7 @@ function TimelinePage() {
                       plugins={[timeGridPlugin]}
                       initialView="timeGridDay"
                       locale="en"
+                      initialDate={getInitialDate(i)}
                       allDaySlot={false}
                       dayHeaders={false}
                       headerToolbar={false}
@@ -166,6 +167,7 @@ function TimelinePage() {
                           plugins={[timeGridPlugin, interactionPlugin]}
                           initialView="timeGridDay"
                           locale="ja"
+                          initialDate={getInitialDate(i)}
                           allDaySlot={false}
                           dayHeaders={false}
                           headerToolbar={false}
@@ -183,7 +185,7 @@ function TimelinePage() {
                             EditTimelineEventOpen();
                           }}
                           dateClick={(args: DateClickArg) => {
-                            handleClickTimeline(args, c);
+                            handleClickTimeline(args, c, i);
                           }}
                           slotLabelInterval={config.interval}
                           slotDuration={config.interval}

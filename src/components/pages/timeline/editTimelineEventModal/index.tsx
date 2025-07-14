@@ -15,14 +15,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "@mantine/form";
 import { TimePicker } from "@mantine/dates";
 import type { RootState } from "../../../../app/store";
-import {
-  selectTimes,
-  timelineSlice,
-} from "../../../../features/timelines/timelineSlice";
+import { timelineSlice } from "../../../../features/timelines/timelineSlice";
 import { COLOR_SET } from "../../../../app/appConstants";
 import { useTimelineEvent } from "./hooks";
 import { editEventModalValidator } from "./validator";
-import type { TimelineEventFormData } from "../../../../features/models";
+import type {
+  TimelineConfig,
+  TimelineEventFormData,
+} from "../../../../features/models";
 
 export type EditTimelineEventModalProps = {
   opened: boolean;
@@ -63,11 +63,13 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
   const { config } = useSelector(
     (s: RootState) => s[timelineSlice.reducerPath]
   );
-  const times = useSelector(selectTimes);
 
   // カスタムフックからロジックを取得
-  const { initialValues, buildPayload, finalizeTimelineEvent } =
+  const { initialValues, buildPayload, finalizeTimelineEvent, getTimePresets } =
     useTimelineEvent(selectedEvent, config);
+
+  // TimeInputのプリセット
+  const timePresets = getTimePresets(Number(selectedEvent?.days));
 
   // フォームデータ
   const form = useForm<TimelineEventFormData>({
@@ -121,7 +123,7 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
             <></>
           )}
           {/* 開始時間、終了時間 */}
-          <TimeRangePicker times={times} form={form} />
+          <TimeRangePicker times={timePresets} form={form} config={config} />
 
           {/* 証言者 */}
           <ListChipSelector
@@ -209,11 +211,22 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
 type TimeRangePickerProps = {
   times: string[];
   form: ReturnType<typeof useForm<TimelineEventFormData>>;
+  config: TimelineConfig;
 };
 
 /** 時間選択 */
-const TimeRangePicker: React.FC<TimeRangePickerProps> = ({ times, form }) => (
+const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
+  times,
+  form,
+  config,
+}) => (
   <Grid align="flex-end">
+    {/* 日をまたぐ場合の日数 */}
+    {config.days > 1 ? (
+      <Grid.Col span="content">{String(form.values.days) + "日目の"}</Grid.Col>
+    ) : (
+      <></>
+    )}
     <Grid.Col span="auto">
       <TimePicker
         label="開始時間"

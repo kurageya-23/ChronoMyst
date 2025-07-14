@@ -57,7 +57,8 @@ export type TimelineEvent = {
 export type TimelineEventFormData = {
   id: string;
   startTime: string;
-  endTime?: string;
+  endTime: string;
+  days: string;
   placeId: string;
   place: Place;
   witnessId: string;
@@ -79,6 +80,7 @@ export type ExtendedCalenderEventProp = {
   witness: Character;
   characters: Character[];
   place?: Place;
+  days: number;
 };
 
 // タイムライン設定
@@ -110,14 +112,17 @@ export type TimelineJson = {
 };
 
 /** --------モデルに関する処理-------- */
-/** 時刻文字列 → 今日の日付ISO */
-const toToday = (timeStr: string): string => {
-  const today = new Date();
+/** 日またぎのカレンダーを考慮した日付計算 */
+const calcCalendarDate = (timeStr: string, days: number) => {
+  const date = new Date();
+  // 日またぎを考慮した加算
+  date.setDate(date.getDate() + days - 1);
+
   const [h, m] = timeStr.split(":").map(Number);
   return new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
+    date.getFullYear(),
+    date.getMonth(),
+    date.getDate(),
     h,
     m,
     0,
@@ -149,6 +154,7 @@ export const calendarToForm = (event: EventApi): TimelineEventFormData => {
     characters: (event.extendedProps.characters as Character[]) ?? [],
     placeId: (event.extendedProps.place as Place)?.id ?? "",
     place: event.extendedProps.place as Place,
+    days: event.extendedProps.days,
   };
 };
 
@@ -157,14 +163,15 @@ export const formToCalendar = (form: TimelineEventFormData) =>
   ({
     id: form.id,
     title: form.detail,
-    start: toToday(form.startTime),
-    end: form.endTime ? toToday(form.endTime) : "",
+    start: calcCalendarDate(form.startTime, Number(form.days)),
+    end: calcCalendarDate(form.endTime, Number(form.days)),
     borderColor: form.color,
     backgroundColor: form.color,
     extendedProps: {
       witness: form.witness,
       characters: form.characters,
       place: form.place,
+      days: Number(form.days),
     },
   } as TimelineEvent);
 
