@@ -86,6 +86,7 @@ export type TimelineConfig = {
   interval: string;
   startTime: string;
   endTime: string;
+  days: number;
   witnesses: Character[];
   characters: Character[];
   places: Place[];

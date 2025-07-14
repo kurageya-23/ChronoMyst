@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useEffect } from "react";
+import { useMemo, useCallback, useEffect, useState } from "react";
 import { useForm } from "@mantine/form";
 import { useSelector, useDispatch } from "react-redux";
 import { getTimeRange, isTimeAfter } from "@mantine/dates";
@@ -15,11 +15,15 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
     (s: RootState) => s[timelineSlice.reducerPath] as { config: TimelineConfig }
   ).config;
 
+  // 日をまたぐシナリオのフラグ
+  const [multiDaysChecked, setMultiDaysChecked] = useState(false);
+
   const initialValues = useMemo<TimelineConfig>(
     () => ({
       interval: config.interval,
       startTime: config.startTime,
       endTime: config.endTime,
+      days: config.days,
       witnesses: config.characters.map((c) => ({ ...c })),
       characters: config.characters.map((c) => ({ ...c })),
       places: config.places.map((p) => ({ ...p })),
@@ -93,6 +97,17 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
     [form]
   );
 
+  /** 日をまたぐシナリオスイッチの変更 */
+  const onChangeMultiDaysCheck = useCallback(
+    (checked: boolean) => {
+      // 日をまたぐシナリオがfalseということは、daysを1にセット
+      if (!checked) form.values.days = 1;
+
+      setMultiDaysChecked(checked);
+    },
+    [form.values]
+  );
+
   /** 設定更新 */
   const handleSubmit = useCallback(
     (values: TimelineConfig) => {
@@ -112,5 +127,7 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
     onCharacterRemove,
     onPlaceInsert,
     onPlaceRemove,
+    multiDaysChecked,
+    onChangeMultiDaysCheck,
   };
 };

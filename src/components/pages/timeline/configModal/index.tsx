@@ -9,6 +9,8 @@ import {
   Group,
   Button,
   TextInput,
+  Switch,
+  Select,
 } from "@mantine/core";
 import { TimePicker } from "@mantine/dates";
 import DynamicList from "../../../DynamicList";
@@ -40,6 +42,8 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
     onCharacterRemove,
     onPlaceInsert,
     onPlaceRemove,
+    multiDaysChecked,
+    onChangeMultiDaysCheck,
   } = useTimelineConfig(opened, onClose);
 
   return (
@@ -55,40 +59,71 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap={4}>
             {/* 時間設定 */}
-            <Fieldset legend="時間">
-              <TimePicker
-                {...form.getInputProps("interval")}
-                label="間隔"
-                withAsterisk
-                withDropdown
-                presets={INTERVAL_PRESETS}
-              />
+            <Fieldset legend="タイムラインの表示設定">
+              <Stack gap={4}>
+                {/* 時間間隔 */}
+                <TimePicker
+                  {...form.getInputProps("interval")}
+                  label="間隔"
+                  withAsterisk
+                  withDropdown
+                  presets={INTERVAL_PRESETS}
+                />
 
-              <Grid align="flex-end" mt="sm">
-                <Grid.Col span="auto">
-                  <TimePicker
-                    {...form.getInputProps("startTime")}
-                    label="開始時間"
-                    withAsterisk
-                    withDropdown
-                    presets={presets}
-                  />
-                </Grid.Col>
+                {/* 日をまたぐシナリオかどうか */}
+                <Switch
+                  mt="sm"
+                  checked={multiDaysChecked}
+                  onChange={(event) => {
+                    onChangeMultiDaysCheck(event.currentTarget.checked);
+                  }}
+                  label="日をまたぐシナリオ"
+                  labelPosition="right"
+                />
 
-                <Grid.Col span="content">
-                  <Text mb={6}>ー</Text>
-                </Grid.Col>
+                {/* 開始、終了時間 */}
+                <Grid align="flex-end">
+                  <Grid.Col span="auto">
+                    <TimePicker
+                      {...form.getInputProps("startTime")}
+                      label="開始時間"
+                      withAsterisk
+                      withDropdown
+                      presets={presets}
+                    />
+                  </Grid.Col>
 
-                <Grid.Col span="auto">
-                  <TimePicker
-                    {...form.getInputProps("endTime")}
-                    label="終了時間"
-                    withAsterisk
-                    withDropdown
-                    presets={presets}
-                  />
-                </Grid.Col>
-              </Grid>
+                  <Grid.Col span="content">
+                    <Text mb={6}>ー</Text>
+                  </Grid.Col>
+
+                  {/* 日をまたぐ場合の日数 */}
+                  {multiDaysChecked ? (
+                    <Grid.Col span="content">
+                      <Group align="flex-end" gap={2}>
+                        <Select
+                          w={60}
+                          {...form.getInputProps("days")}
+                          data={["1", "2", "3"]}
+                        />
+                        {"日目の"}
+                      </Group>
+                    </Grid.Col>
+                  ) : (
+                    <></>
+                  )}
+
+                  <Grid.Col span="auto">
+                    <TimePicker
+                      {...form.getInputProps("endTime")}
+                      label="終了時間"
+                      withAsterisk
+                      withDropdown
+                      presets={presets}
+                    />
+                  </Grid.Col>
+                </Grid>
+              </Stack>
             </Fieldset>
 
             {/* 登場人物 */}
