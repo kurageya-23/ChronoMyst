@@ -11,6 +11,7 @@ import {
   TextInput,
   Switch,
   Select,
+  Textarea,
 } from "@mantine/core";
 import { TimePicker } from "@mantine/dates";
 import DynamicList from "../../../DynamicList";
@@ -191,6 +192,18 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
                     />
                   </>
                 )}
+              />
+            </Fieldset>
+
+            {/* あらすじ */}
+            <Fieldset legend="あらすじ" mt="md">
+              {/* メモ */}
+              <Textarea
+                maxLength={2000}
+                {...form.getInputProps("memo")}
+                autosize
+                minRows={8}
+                resize="block"
               />
             </Fieldset>
 

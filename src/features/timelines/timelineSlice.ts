@@ -48,6 +48,7 @@ export const timelineSlice = createAppSlice({
     updateConfig: create.reducer(
       (state, action: PayloadAction<TimelineConfig>) => {
         console.debug("[reducer] updateConfig start.", action.payload);
+        state.scenario.memo = action.payload.prologue;
         state.config = action.payload;
         console.debug("[reducer] updateConfig end.");
       }

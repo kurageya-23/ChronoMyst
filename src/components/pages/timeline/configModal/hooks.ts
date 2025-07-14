@@ -27,6 +27,7 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
       witnesses: config.characters.map((c) => ({ ...c })),
       characters: config.characters.map((c) => ({ ...c })),
       places: config.places.map((p) => ({ ...p })),
+      prologue: config.prologue,
     }),
     [config]
   );

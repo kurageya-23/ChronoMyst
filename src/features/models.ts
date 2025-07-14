@@ -92,6 +92,7 @@ export type TimelineConfig = {
   witnesses: Character[];
   characters: Character[];
   places: Place[];
+  prologue: string;
 };
 
 // タイムライン
