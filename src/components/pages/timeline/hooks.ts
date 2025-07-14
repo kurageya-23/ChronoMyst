@@ -64,7 +64,7 @@ export const useTimeline = (config: Timeline["config"]) => {
       const isOverNight = config.days > 1;
       if (!isOverNight) return config.endTime;
 
-      // 2. 初日のカレンダーは開始時間をそのまま使用
+      // 2. 最終日のカレンダーは終了時間をそのまま使用
       const isLastDate = idx + 1 === config.days;
       if (isLastDate) return config.endTime;
 

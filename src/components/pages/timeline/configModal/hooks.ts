@@ -113,6 +113,8 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
     (values: TimelineConfig) => {
       // 証言者にはキャラクター+NPCを追加
       values.witnesses = values.characters.concat([npcSample]);
+      // <select />のoptionsが文字列しか扱えないので設定反映時にキャストする
+      values.days = Number(values.days);
       dispatch(timelineSlice.actions.updateConfig(values));
       onClose();
     },
