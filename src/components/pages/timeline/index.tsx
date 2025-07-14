@@ -162,11 +162,13 @@ function TimelinePage() {
                     eventContent={CustomTimelineEvent}
                     events={filteredEvents}
                     eventClick={(info) => {
+                      console.log("Event Click!");
                       info.jsEvent.preventDefault();
                       setSelectedEvent(calendarToForm(info.event));
                       EditTimelineEventOpen();
                     }}
                     dateClick={(args: DateClickArg) => {
+                      console.log("Date Click!");
                       handleClickTimeline(args, c);
                     }}
                     slotLabelInterval={config.interval}

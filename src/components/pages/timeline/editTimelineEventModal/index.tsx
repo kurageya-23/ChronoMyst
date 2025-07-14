@@ -99,8 +99,11 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
   };
 
   /** イベントデータの削除 */
-  const handleDelete = () => {
-    if (window.confirm("本当にこのイベントを削除しますか？")) {
+  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
+    // FIXME: formのsubmit発火を防止
+    e.preventDefault();
+
+    if (window.confirm("本当にこのイベントを削除しますか？" + form.values.id)) {
       dispatch(timelineSlice.actions.deleteTimelineEvent(form.values.id));
     }
     onClose();
@@ -182,7 +185,7 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
           />
           {selectedEvent?.id ? (
             <Group justify="space-between" mt="md">
-              <Button color="red" onClick={handleDelete}>
+              <Button type="button" color="red" onClick={handleDelete}>
                 削除
               </Button>
               <Button type="submit" color="indigo">
