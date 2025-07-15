@@ -56,9 +56,12 @@ export type TimelineEvent = {
 /** イベント登録専用データ定義 */
 export type TimelineEventFormData = {
   id: string;
+  startDateTime: Date | null;
+  startDateTimeStr: string;
   startTime: string;
+  endDateTime: Date | null;
+  endDateTimeStr: string;
   endTime: string;
-  days: string;
   placeId: string;
   place: Place;
   witnessId: string;
@@ -80,15 +83,18 @@ export type ExtendedCalenderEventProp = {
   witness: Character;
   characters: Character[];
   place?: Place;
-  days: number;
 };
 
 // タイムライン設定
 export type TimelineConfig = {
+  // 時間間隔
   interval: string;
-  startTime: string;
-  endTime: string;
-  days: number;
+  // 行動時間量
+  timeAmount: string;
+  // 行動開始 タイムライン時間
+  timelineStartTime: string;
+  // 行動終了 タイムライン時間 = 行動開始 タイムライン時間 + 行動時間量
+  timelineEndTime: string;
   witnesses: Character[];
   characters: Character[];
   places: Place[];
@@ -113,24 +119,6 @@ export type TimelineJson = {
 };
 
 /** --------モデルに関する処理-------- */
-/** 日またぎのカレンダーを考慮した日付計算 */
-const calcCalendarDate = (timeStr: string, days: number) => {
-  const date = new Date();
-  // 日またぎを考慮した加算
-  date.setDate(date.getDate() + days - 1);
-
-  const [h, m] = timeStr.split(":").map(Number);
-  return new Date(
-    date.getFullYear(),
-    date.getMonth(),
-    date.getDate(),
-    h,
-    m,
-    0,
-    0
-  ).toISOString();
-};
-
 /** FullCalendar EventApi → フォームの型 */
 export const calendarToForm = (event: EventApi): TimelineEventFormData => {
   const isoToHM = (iso: string) => {
@@ -143,7 +131,11 @@ export const calendarToForm = (event: EventApi): TimelineEventFormData => {
 
   return {
     id: event.id,
+    startDateTime: event.start,
+    startDateTimeStr: event.start?.toISOString() ?? "",
     startTime: event.startStr ? isoToHM(event.startStr) : "",
+    endDateTime: event.end,
+    endDateTimeStr: event.end?.toISOString() ?? "",
     endTime: event.endStr ? isoToHM(event.endStr) : "",
     detail: event.title,
     color: event.backgroundColor,
@@ -155,7 +147,6 @@ export const calendarToForm = (event: EventApi): TimelineEventFormData => {
     characters: (event.extendedProps.characters as Character[]) ?? [],
     placeId: (event.extendedProps.place as Place)?.id ?? "",
     place: event.extendedProps.place as Place,
-    days: event.extendedProps.days,
   };
 };
 
@@ -164,15 +155,14 @@ export const formToCalendar = (form: TimelineEventFormData) =>
   ({
     id: form.id,
     title: form.detail,
-    start: calcCalendarDate(form.startTime, Number(form.days)),
-    end: calcCalendarDate(form.endTime, Number(form.days)),
+    start: form.startDateTimeStr,
+    end: form.endDateTimeStr,
     borderColor: form.color,
     backgroundColor: form.color,
     extendedProps: {
       witness: form.witness,
       characters: form.characters,
       place: form.place,
-      days: Number(form.days),
     },
   } as TimelineEvent);
 
@@ -197,12 +187,12 @@ export const solveTimelineEvent = (
 export const assignTimelineEventId = (
   values: TimelineEventFormData,
   isNew: boolean
-) => {
+): TimelineEventFormData => {
   const formWithId =
     isNew && !values.id
       ? ({ ...values, id: uuidv4() } as unknown as TimelineEventFormData)
       : values;
-  return formToCalendar(formWithId);
+  return formWithId;
 };
 
 /** -------サンプルデータ-------- */

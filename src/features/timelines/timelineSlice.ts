@@ -20,9 +20,9 @@ const initialTimeline: Timeline = {
   timelineEvents: [],
   config: {
     interval: "01:00",
-    startTime: "18:00:00",
-    endTime: "23:00:00",
-    days: 1,
+    timeAmount: "04:00",
+    timelineStartTime: "18:00:00",
+    timelineEndTime: "22:00:00",
     witnesses: witnessesSample,
     characters: charactersSample,
     places: placesSample,

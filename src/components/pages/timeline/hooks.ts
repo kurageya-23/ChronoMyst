@@ -2,6 +2,7 @@ import { useCallback, useState } from "react";
 import {
   assignTimelineEventId,
   calendarToForm,
+  formToCalendar,
   solveTimelineEvent,
   type Character,
   type Timeline,
@@ -24,7 +25,7 @@ import { COLOR_EVENT_DEFAULT } from "../../../app/appConstants";
  * @param config Timeline.config（characters, places 等）
  */
 export const useTimeline = (config: Timeline["config"]) => {
-  /** フォーム送信前にキャラクターと場所を解決 */
+  /** TODO: 重複しているので共通化 フォーム送信前にキャラクターと場所を解決 */
   const buildPayload = useCallback(
     (values: TimelineEventFormData): TimelineEventFormData => {
       return solveTimelineEvent(values, config);
@@ -32,45 +33,13 @@ export const useTimeline = (config: Timeline["config"]) => {
     [config]
   );
 
-  /** 新規作成時はIDを補完するラッパー */
+  /** TODO: 重複しているので共通化 新規作成時はIDを補完するラッパー */
   const finalizeTimelineEvent = useCallback(
     (values: TimelineEventFormData, isNew: boolean): TimelineEvent => {
-      return assignTimelineEventId(values, isNew);
+      const formWithId = assignTimelineEventId(values, isNew);
+      return formToCalendar(formWithId);
     },
     []
-  );
-
-  /** カレンダーの開始時刻を算出 */
-  const calendarSlotMinTime = useCallback(
-    (idx: number) => {
-      // 1. 2日以上の設定でないのなら開始時間をそのまま使用
-      const isOverNight = config.days > 1;
-      if (!isOverNight) return config.startTime;
-
-      // 2. 初日のカレンダーは開始時間をそのまま使用
-      const isFirstDate = idx + 1 === 1;
-      if (isFirstDate) return config.startTime;
-
-      // 3. 初日以外のカレンダーは"00:00:00"を開始時間とする
-      return "00:00:00";
-    },
-    [config]
-  );
-
-  /** カレンダーの終了時刻を算出 */
-  const calendarSlotMaxTime = useCallback(
-    (idx: number) => {
-      // 1. 2日以上の設定でないのなら開始時間をそのまま使用
-      const isOverNight = config.days > 1;
-      if (!isOverNight) return config.endTime;
-
-      // 2. 最終日のカレンダーは終了時間をそのまま使用
-      const isLastDate = idx + 1 === config.days;
-      if (isLastDate) return config.endTime;
-
-      return "24:00:00";
-    },
-    [config]
   );
 
   const dispatch = useDispatch();
@@ -92,20 +61,19 @@ export const useTimeline = (config: Timeline["config"]) => {
   };
 
   /** タイムライン上の直接クリックイベントハンドラ */
-  const handleClickTimeline = (
-    info: DateClickArg,
-    charcter: Character,
-    index: number
-  ) => {
+  const handleClickTimeline = (info: DateClickArg, charcter: Character) => {
     // 開始時間はクリック箇所、終了時間は開始時間 + 時間間隔
     const intervalMin = toMinute(config.interval);
     setSelectedEvent({
+      startDateTime: info.date,
+      startDateTimeStr: info.date.toISOString(),
       startTime: info.date.toTimeString().slice(0, 5),
+      endDateTime: addMinutes(info.date, intervalMin),
+      endDateTimeStr: addMinutes(info.date, intervalMin).toISOString(),
       endTime: addMinutes(info.date, intervalMin).toTimeString().slice(0, 5),
       detail: "",
       characterIds: [charcter.id],
       color: COLOR_EVENT_DEFAULT,
-      days: String(index + 1),
     } as TimelineEventFormData);
     EditTimelineEventOpen();
   };
@@ -135,21 +103,12 @@ export const useTimeline = (config: Timeline["config"]) => {
     setSelectedCharacter(null);
   };
 
-  /** 本日からoffset分日付を加算して返す */
-  const getInitialDate = (offset: number) => {
-    const d = new Date();
-    d.setDate(d.getDate() + offset);
-    return d;
-  };
-
   return {
     buildPayload,
     finalizeTimelineEvent,
     handleEventDrop,
     handleEventResize,
     handleClickTimeline,
-    calendarSlotMinTime,
-    calendarSlotMaxTime,
     // イベント編集モーダル
     selectedEvent,
     setSelectedEvent,
@@ -162,6 +121,5 @@ export const useTimeline = (config: Timeline["config"]) => {
     isEditCharacterMemoModalOpen,
     EditCharacterMemoModalOpen,
     handleEditCharacterMemoClose,
-    getInitialDate,
   };
 };

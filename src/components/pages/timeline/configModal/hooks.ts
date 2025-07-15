@@ -1,4 +1,4 @@
-import { useMemo, useCallback, useEffect, useState } from "react";
+import { useMemo, useCallback, useEffect } from "react";
 import { useForm } from "@mantine/form";
 import { useSelector, useDispatch } from "react-redux";
 import { getTimeRange, isTimeAfter } from "@mantine/dates";
@@ -8,6 +8,8 @@ import { npcSample, type TimelineConfig } from "../../../../features/models";
 import { configModalValidator } from "./validator";
 import { v4 as uuidv4 } from "uuid";
 import { useNextSort } from "../../../../features/utils/useNextSort";
+import { INTERVAL_MIN } from "../../../../app/appConstants";
+import { computeEndTime } from "../../../../app/util";
 
 export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
   const dispatch = useDispatch();
@@ -15,15 +17,12 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
     (s: RootState) => s[timelineSlice.reducerPath] as { config: TimelineConfig }
   ).config;
 
-  // 日をまたぐシナリオのフラグ
-  const [multiDaysChecked, setMultiDaysChecked] = useState(false);
-
   const initialValues = useMemo<TimelineConfig>(
     () => ({
       interval: config.interval,
-      startTime: config.startTime,
-      endTime: config.endTime,
-      days: config.days,
+      timeAmount: config.timeAmount,
+      timelineStartTime: config.timelineStartTime,
+      timelineEndTime: config.timelineEndTime,
       witnesses: config.characters.map((c) => ({ ...c })),
       characters: config.characters.map((c) => ({ ...c })),
       places: config.places.map((p) => ({ ...p })),
@@ -45,14 +44,28 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
     }
   }, [opened]);
 
-  // interval に合わせてプリセット生成
-  const presets = useMemo(() => {
+  /** 行動開始時間のプリセット */
+  const startTimePresets = useMemo(() => {
     const interval = isTimeAfter(form.values.interval, "00:10")
       ? form.values.interval
       : "00:10";
 
     return getTimeRange({
       startTime: "00:00",
+      endTime: "24:00",
+      interval,
+    });
+  }, [form.values.interval]);
+
+  /** 行動時間量のプリセット */
+  const timeAmountPresets = useMemo(() => {
+    // インターバルの最小値は10分
+    const interval = isTimeAfter(form.values.interval, INTERVAL_MIN)
+      ? form.values.interval
+      : INTERVAL_MIN;
+
+    return getTimeRange({
+      startTime: form.values.interval,
       endTime: "24:00",
       interval,
     });
@@ -98,24 +111,18 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
     [form]
   );
 
-  /** 日をまたぐシナリオスイッチの変更 */
-  const onChangeMultiDaysCheck = useCallback(
-    (checked: boolean) => {
-      // 日をまたぐシナリオがfalseということは、daysを1にセット
-      if (!checked) form.values.days = 1;
-
-      setMultiDaysChecked(checked);
-    },
-    [form.values]
-  );
-
   /** 設定更新 */
   const handleSubmit = useCallback(
     (values: TimelineConfig) => {
       // 証言者にはキャラクター+NPCを追加
       values.witnesses = values.characters.concat([npcSample]);
-      // <select />のoptionsが文字列しか扱えないので設定反映時にキャストする
-      values.days = Number(values.days);
+
+      // endTimeにstartTime + timeAmountをセット
+      values.timelineEndTime = computeEndTime(
+        values.timelineStartTime,
+        values.timeAmount
+      );
+
       dispatch(timelineSlice.actions.updateConfig(values));
       onClose();
     },
@@ -124,13 +131,12 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
 
   return {
     form,
-    presets,
+    startTimePresets,
+    timeAmountPresets,
     handleSubmit,
     onCharacterInsert,
     onCharacterRemove,
     onPlaceInsert,
     onPlaceRemove,
-    multiDaysChecked,
-    onChangeMultiDaysCheck,
   };
 };

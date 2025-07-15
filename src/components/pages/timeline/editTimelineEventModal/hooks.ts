@@ -2,15 +2,15 @@
 import { useMemo, useCallback } from "react";
 
 import {
-  type Place,
   type TimelineEvent,
   type Timeline,
   type TimelineEventFormData,
   solveTimelineEvent,
   assignTimelineEventId,
-  type Character,
+  type TimelineConfig,
+  formToCalendar,
 } from "../../../../features/models";
-import { COLOR_EVENT_DEFAULT } from "../../../../app/appConstants";
+import { CALENDAR_INIT_DATE } from "../../../../app/appConstants";
 
 /**
  * カスタムフック
@@ -23,26 +23,11 @@ export const useTimelineEvent = (
 ) => {
   // 1. 初期値をメモ化
   const initialValues: TimelineEventFormData = useMemo(() => {
-    if (event?.id) return event;
-    if (event?.startTime) return event;
-
-    return {
-      id: "",
-      startTime: "",
-      endTime: "",
-      days: "1",
-      detail: "",
-      color: COLOR_EVENT_DEFAULT,
-      witnessId: "",
-      witness: {} as Character,
-      characterIds: [],
-      characters: [],
-      placeId: "",
-      place: {} as Place,
-    };
+    console.log("useTimelineEvent:event", event, config);
+    return event!;
   }, [event]);
 
-  // 2. フォーム送信前にキャラクターと場所を解決
+  // TODO: 重複しているので共通化 2. フォーム送信前にキャラクターと場所を解決
   const buildPayload = useCallback(
     (values: TimelineEventFormData): TimelineEventFormData => {
       return solveTimelineEvent(values, config);
@@ -50,66 +35,85 @@ export const useTimelineEvent = (
     [config]
   );
 
-  // 3. 新規作成時はIDを補完するラッパー
+  // TODO: 重複しているので共通化 3. 新規作成時はIDを補完するラッパー
   const finalizeTimelineEvent = useCallback(
     (values: TimelineEventFormData, isNew: boolean): TimelineEvent => {
-      return assignTimelineEventId(values, isNew);
+      const formWithId = assignTimelineEventId(values, isNew);
+      return formToCalendar(formWithId);
     },
     []
   );
 
-  /** 開始時間、終了時間TimeInputのプリセットを生成 */
-  const getTimePresets = (days: number) => {
-    const toMinutes = (hm: string) => {
-      const [h, m] = hm.split(":").map(Number);
-      return h * 60 + m;
-    };
-    const toHmString = (min: number) => {
-      const h = Math.floor(min / 60);
-      const m = min % 60;
-      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-    };
+  type TimeItem = { value: string; label: string };
+  type GroupedTimeOptions = {
+    group: string;
+    items: TimeItem[];
+  }[];
 
-    const startMin = toMinutes(config.startTime);
-    const endMin = toMinutes(config.endTime);
-    const stepMin = toMinutes(config.interval);
-    const fullStart = toMinutes("00:00");
-    const fullEnd = toMinutes("24:00"); // 1440 分
+  const useTimeOptions = (
+    config: Pick<
+      TimelineConfig,
+      "timelineStartTime" | "timelineEndTime" | "interval"
+    >
+  ): GroupedTimeOptions => {
+    return useMemo<GroupedTimeOptions>(() => {
+      // "HH:mm" → 分
+      const toMinutes = (hm: string) => {
+        const [h, m] = hm.split(":").map(Number);
+        return h * 60 + m;
+      };
 
-    const times: string[] = [];
-    // 1日表示 or 単一日モード
-    if (config.days <= 1) {
+      const startMin = toMinutes(config.timelineStartTime);
+      const endMin = toMinutes(config.timelineEndTime);
+      const stepMin = toMinutes(config.interval);
+
+      // カレンダー初期日付の午夜をベースにする
+      const baseDate = new Date(`${CALENDAR_INIT_DATE}T00:00:00`);
+
+      type Flat = { group: string; value: string; label: string };
+      const flat: Flat[] = [];
+
       for (let t = startMin; t <= endMin; t += stepMin) {
-        times.push(toHmString(t));
-      }
-      return times;
-    }
+        const rawH = Math.floor(t / 60);
+        const m = t % 60;
+        const labelH = rawH % 24;
+        const hh = String(labelH).padStart(2, "0");
+        const mm = String(m).padStart(2, "0");
 
-    // 複数日モード
-    if (days === 1) {
-      // 1日目: startTime → 24:00
-      for (let t = startMin; t <= fullEnd; t += stepMin) {
-        times.push(toHmString(t));
-      }
-    } else if (days === config.days) {
-      // 最終日: 00:00 → endTime
-      for (let t = fullStart; t <= endMin; t += stepMin) {
-        times.push(toHmString(t));
-      }
-    } else {
-      // 中間日: 00:00 → 24:00
-      for (let t = fullStart; t <= fullEnd; t += stepMin) {
-        times.push(toHmString(t));
-      }
-    }
+        // 何日目か = (rawH / 24 の切り捨て) + 1
+        const dayNum = Math.floor(rawH / 24) + 1;
+        const group = `${dayNum}日目`;
+        const label = `${hh}:${mm}`;
 
-    return times;
+        // baseDate をコピーして日数をずらす
+        const dt = new Date(baseDate);
+        dt.setDate(dt.getDate() + (dayNum - 1));
+        // 時刻をセット
+        dt.setHours(labelH, m, 0, 0);
+
+        // ローカル時刻を ISO UTC 文字列に
+        const value = dt.toISOString();
+
+        flat.push({ group, value, label });
+      }
+
+      // グループ化して返却
+      const map = new Map<string, TimeItem[]>();
+      flat.forEach(({ group, value, label }) => {
+        if (!map.has(group)) {
+          map.set(group, []);
+        }
+        map.get(group)!.push({ value, label });
+      });
+
+      return Array.from(map, ([group, items]) => ({ group, items }));
+    }, [config.timelineStartTime, config.timelineEndTime, config.interval]);
   };
 
   return {
     initialValues,
     buildPayload,
     finalizeTimelineEvent,
-    getTimePresets,
+    useTimeOptions,
   };
 };

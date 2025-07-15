@@ -2,7 +2,6 @@ import React, { useEffect } from "react";
 import {
   Button,
   Container,
-  Grid,
   Group,
   Modal,
   Text,
@@ -10,19 +9,16 @@ import {
   Textarea,
   Chip,
   Stack,
+  Select,
 } from "@mantine/core";
 import { useDispatch, useSelector } from "react-redux";
 import { useForm } from "@mantine/form";
-import { TimePicker } from "@mantine/dates";
 import type { RootState } from "../../../../app/store";
 import { timelineSlice } from "../../../../features/timelines/timelineSlice";
 import { COLOR_SET } from "../../../../app/appConstants";
 import { useTimelineEvent } from "./hooks";
 import { editEventModalValidator } from "./validator";
-import type {
-  TimelineConfig,
-  TimelineEventFormData,
-} from "../../../../features/models";
+import type { TimelineEventFormData } from "../../../../features/models";
 
 export type EditTimelineEventModalProps = {
   opened: boolean;
@@ -65,11 +61,17 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
   );
 
   // カスタムフックからロジックを取得
-  const { initialValues, buildPayload, finalizeTimelineEvent, getTimePresets } =
+  const { initialValues, buildPayload, finalizeTimelineEvent, useTimeOptions } =
     useTimelineEvent(selectedEvent, config);
 
-  // TimeInputのプリセット
-  const timePresets = getTimePresets(Number(selectedEvent?.days));
+  // 時間の選択肢
+  const timeOptions = useTimeOptions({
+    timelineStartTime: config.timelineStartTime,
+    timelineEndTime: config.timelineEndTime,
+    interval: config.interval,
+  });
+
+  console.log(timeOptions);
 
   // フォームデータ
   const form = useForm<TimelineEventFormData>({
@@ -122,8 +124,23 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
           ) : (
             <></>
           )}
-          {/* 開始時間、終了時間 */}
-          <TimeRangePicker times={timePresets} form={form} config={config} />
+          <Group align="flex-end">
+            <Select
+              label="開始時間"
+              data={timeOptions}
+              {...form.getInputProps("startDateTimeStr")}
+              searchable={false}
+              clearable={false}
+            />
+            <Text>ー</Text>
+            <Select
+              label="終了時間"
+              data={timeOptions}
+              {...form.getInputProps("endDateTimeStr")}
+              searchable={false}
+              clearable={false}
+            />
+          </Group>
 
           {/* 証言者 */}
           <ListChipSelector
@@ -206,50 +223,6 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
     </Container>
   );
 };
-
-// コンポーネント分割
-type TimeRangePickerProps = {
-  times: string[];
-  form: ReturnType<typeof useForm<TimelineEventFormData>>;
-  config: TimelineConfig;
-};
-
-/** 時間選択 */
-const TimeRangePicker: React.FC<TimeRangePickerProps> = ({
-  times,
-  form,
-  config,
-}) => (
-  <Grid align="flex-end">
-    {/* 日をまたぐ場合の日数 */}
-    {config.days > 1 ? (
-      <Grid.Col span="content">{String(form.values.days) + "日目の"}</Grid.Col>
-    ) : (
-      <></>
-    )}
-    <Grid.Col span="auto">
-      <TimePicker
-        label="開始時間"
-        withAsterisk
-        withDropdown
-        presets={times}
-        {...form.getInputProps("startTime")}
-      />
-    </Grid.Col>
-    <Grid.Col span="content">
-      <Text mb={6}>ー</Text>
-    </Grid.Col>
-    <Grid.Col span="auto">
-      <TimePicker
-        label="終了時間"
-        withAsterisk
-        withDropdown
-        presets={times}
-        {...form.getInputProps("endTime")}
-      />
-    </Grid.Col>
-  </Grid>
-);
 
 /** メモ */
 const TextareaInput: React.FC<{

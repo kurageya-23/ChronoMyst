@@ -1,5 +1,8 @@
 /** システム全体の定数 */
 
+/** カレンダーの初期日付 */
+export const CALENDAR_INIT_DATE = "2025-05-24";
+
 // 今日の日付をよく使うので、静的に生成しておく
 const now = new Date();
 
@@ -28,6 +31,11 @@ export const COLOR_SET = [
 
 /** イベントのデフォルトカラー */
 export const COLOR_EVENT_DEFAULT = "#868e96";
+
+/** 最小時間間隔 */
+export const INTERVAL_MIN = "00:10";
+/** 最大時間間隔 */
+export const INTERVAL_MAX = "02:00";
 
 /** 時間間隔のプリセット */
 export const INTERVAL_PRESETS = ["00:10", "00:15", "00:30", "01:00", "02:00"];
