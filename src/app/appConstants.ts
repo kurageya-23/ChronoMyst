@@ -1,5 +1,13 @@
 /** システム全体の定数 */
 
+// 今日の日付をよく使うので、静的に生成しておく
+const now = new Date();
+
+/** 当日日付の文字列（yyyy-MM-dd） */
+export const TODAY_STRING = `${now.getFullYear()}-${String(
+  now.getMonth() + 1
+).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+
 /** システム標準のデフォルトカラーセット */
 export const COLOR_SET = [
   "#2e2e2e",

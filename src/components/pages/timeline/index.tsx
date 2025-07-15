@@ -14,12 +14,26 @@ import type { RootState } from "../../../app/store";
 import EditTimelineEventModal from "./editTimelineEventModal";
 import { useTimeline } from "./hooks";
 import EditCharacterMemoModal from "./editCharacterMemoModal";
+import { replaceDateWithToday } from "../../../app/util";
+import { useMemo } from "react";
 
 /** タイムラインページ */
 function TimelinePage() {
   const { timelineEvents, config } = useSelector(
     (state: RootState) => state[timelineSlice.reducerPath]
   ) as Timeline;
+
+  // TODO: これパフォーマンス大丈夫か？
+  const todayTimelineEvents = useMemo(
+    () =>
+      timelineEvents.map((ev) => ({
+        ...ev,
+        // daysも考慮しなきゃ...
+        start: replaceDateWithToday(ev.start),
+        end: replaceDateWithToday(ev.end),
+      })),
+    [timelineEvents]
+  );
 
   // colgroup 用に「時間軸＋キャラ列」を定義
   const cols = [
@@ -150,7 +164,7 @@ function TimelinePage() {
 
             {/* --- 各キャラクターごとの FullCalendar --- */}
             {config.characters.map((c) => {
-              const filteredEvents = timelineEvents.filter((ev) =>
+              const filteredEvents = todayTimelineEvents.filter((ev) =>
                 ev.extendedProps.characters.some((ch) => ch.id === c.id)
               );
               return (
