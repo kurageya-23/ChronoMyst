@@ -9,6 +9,7 @@ import {
   Button,
   TextInput,
   Textarea,
+  Flex,
 } from "@mantine/core";
 import { TimePicker } from "@mantine/dates";
 import DynamicList from "../../../DynamicList";
@@ -68,7 +69,7 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
                 />
 
                 {/* 開始、終了時間 */}
-                <Group align="flex-end" gap={4}>
+                <Flex align="flex-end" gap={4}>
                   <TimePicker
                     label="表示する時間"
                     {...form.getInputProps("timelineStartTime")}
@@ -84,7 +85,7 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
                     presets={timeAmountPresets}
                   />
                   <Text>時間分表示する</Text>
-                </Group>
+                </Flex>
               </Stack>
             </Fieldset>
 

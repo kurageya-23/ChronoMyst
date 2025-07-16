@@ -82,7 +82,7 @@ function TimelinePage() {
                   </Tooltip>
                   <ActionIcon
                     variant="filled"
-                    color="teal"
+                    color={c.color}
                     size="sm"
                     aria-label="Settings"
                     onClick={() => {
