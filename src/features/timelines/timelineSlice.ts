@@ -1,31 +1,30 @@
 import { type PayloadAction } from "@reduxjs/toolkit";
 import { createAppSlice } from "../../app/createAppSlice";
 import {
-  charactersSample,
-  placesSample,
   type TimelineEvent,
-  type Scenario,
   type Timeline,
   type TimelineConfig,
   type EditCharacterMemoFormData,
-  witnessesSample,
 } from "../models";
+import {
+  DEFAULT_CHARACTERS,
+  DEFAULT_PLACES,
+  DEFAULT_SCENARIO,
+  DEFAULT_WITNESS,
+} from "../../app/appConstants";
 
 // Stateの初期化
 const initialTimeline: Timeline = {
-  scenario: {
-    name: "無題",
-    memo: "おもろそう",
-  } as Scenario,
+  scenario: DEFAULT_SCENARIO,
   timelineEvents: [],
   config: {
     interval: "01:00",
-    startTime: "18:00:00",
-    endTime: "23:00:00",
-    days: 1,
-    witnesses: witnessesSample,
-    characters: charactersSample,
-    places: placesSample,
+    timeAmount: "04:00",
+    timelineStartTime: "18:00:00",
+    timelineEndTime: "22:00:00",
+    witnesses: DEFAULT_WITNESS,
+    characters: DEFAULT_CHARACTERS,
+    places: DEFAULT_PLACES,
   } as TimelineConfig,
 };
 

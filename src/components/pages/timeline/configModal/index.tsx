@@ -4,13 +4,10 @@ import {
   Container,
   Stack,
   Fieldset,
-  Grid,
   Text,
   Group,
   Button,
   TextInput,
-  Switch,
-  Select,
   Textarea,
 } from "@mantine/core";
 import { TimePicker } from "@mantine/dates";
@@ -37,14 +34,13 @@ export type ConfigModalProps = {
 const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
   const {
     form,
-    presets,
+    startTimePresets,
+    timeAmountPresets,
     handleSubmit,
     onCharacterInsert,
     onCharacterRemove,
     onPlaceInsert,
     onPlaceRemove,
-    multiDaysChecked,
-    onChangeMultiDaysCheck,
   } = useTimelineConfig(opened, onClose);
 
   return (
@@ -71,59 +67,24 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
                   presets={INTERVAL_PRESETS}
                 />
 
-                {/* 日をまたぐシナリオかどうか */}
-                <Switch
-                  mt="sm"
-                  checked={multiDaysChecked}
-                  onChange={(event) => {
-                    onChangeMultiDaysCheck(event.currentTarget.checked);
-                  }}
-                  label="日をまたぐシナリオ(β)"
-                  labelPosition="right"
-                />
-
                 {/* 開始、終了時間 */}
-                <Grid align="flex-end">
-                  <Grid.Col span="auto">
-                    <TimePicker
-                      {...form.getInputProps("startTime")}
-                      label="開始時間"
-                      withAsterisk
-                      withDropdown
-                      presets={presets}
-                    />
-                  </Grid.Col>
-
-                  <Grid.Col span="content">
-                    <Text mb={6}>ー</Text>
-                  </Grid.Col>
-
-                  {/* 日をまたぐ場合の日数 */}
-                  {multiDaysChecked ? (
-                    <Grid.Col span="content">
-                      <Group align="flex-end" gap={2}>
-                        <Select
-                          w={60}
-                          {...form.getInputProps("days")}
-                          data={["1", "2", "3"]}
-                        />
-                        {"日目の"}
-                      </Group>
-                    </Grid.Col>
-                  ) : (
-                    <></>
-                  )}
-
-                  <Grid.Col span="auto">
-                    <TimePicker
-                      {...form.getInputProps("endTime")}
-                      label="終了時間"
-                      withAsterisk
-                      withDropdown
-                      presets={presets}
-                    />
-                  </Grid.Col>
-                </Grid>
+                <Group align="flex-end" gap={4}>
+                  <TimePicker
+                    label="表示する時間"
+                    {...form.getInputProps("timelineStartTime")}
+                    withAsterisk
+                    withDropdown
+                    presets={startTimePresets}
+                  />
+                  <Text>時から</Text>
+                  <TimePicker
+                    {...form.getInputProps("timeAmount")}
+                    withAsterisk
+                    withDropdown
+                    presets={timeAmountPresets}
+                  />
+                  <Text>時間分表示する</Text>
+                </Group>
               </Stack>
             </Fieldset>
 

@@ -5,11 +5,7 @@ import type { Timeline, TimelineJson } from "../../features/models";
 import { timelineSlice } from "../../features/timelines/timelineSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { useDebouncedValue } from "@mantine/hooks";
-import {
-  getTodayString,
-  replaceDateWithToday,
-  sanitizeFilename,
-} from "../../app/util";
+import { getTodayString, sanitizeFilename } from "../../app/util";
 import pkg from "../../../package.json";
 
 export const useLayout = () => {
@@ -69,13 +65,6 @@ export const useLayout = () => {
 
         // 成功 → Reduxへ投入
         const json = parsed as TimelineJson;
-
-        // ここでstartとendを本日日付に変換
-        json.data.timelineEvents = json.data.timelineEvents.map((ev) => {
-          ev.start = replaceDateWithToday(ev.start);
-          ev.end = replaceDateWithToday(ev.end);
-          return ev;
-        });
 
         dispatch(timelineSlice.actions.jsonImport(json.data));
       } catch (err: any) {

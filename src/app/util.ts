@@ -1,5 +1,3 @@
-import { TODAY_STRING } from "./appConstants";
-
 /** 日付文字列を「yyyyMMdd」形式で返すヘルパー関数 */
 export const getTodayString = () => {
   const d = new Date();
@@ -25,14 +23,26 @@ export const addMinutes = (date: Date, min: number): Date => {
 };
 
 /**
- * ISO 文字列の「yyyy-MM-dd」部分を本日の日付に置き換えて返す
- * @param isoString - 置き換えたい ISO 文字列（例: "2025-07-14T09:15:00.000Z"）
- * @returns 新しい ISO 文字列（例: "2025-07-15T09:15:00.000Z"）
+ * startTime + timeAmount を合算して endTime を返す
+ * 例: startTime="22:00:00", timeAmount="04:00" → "26:00:00"
+ *
+ * @param startTime "HH:mm:ss"
+ * @param timeAmount "HH:mm"
+ * @returns result "H…:mm:ss"（時間部分は 2 桁以上可）
  */
-export const replaceDateWithToday = (isoString: string): string => {
-  // 2. 元の文字列を 'T' で分割し、時刻以降を取得
-  const [, timeAndZone] = isoString.split("T");
+export function computeEndTime(startTime: string, timeAmount: string): string {
+  const [sh, sm] = startTime.split(":").map(Number);
+  const [ah, am] = timeAmount.split(":").map(Number);
 
-  // 3. 今日の日付 + 時刻以降 を結合して返却
-  return `${TODAY_STRING}T${timeAndZone}`;
-};
+  // 分と時間を合算
+  const totalMinutes = sm + am;
+  const carryHours = Math.floor(totalMinutes / 60);
+  const endMinutes = totalMinutes % 60;
+  const endHours = sh + ah + carryHours;
+
+  // フォーマット
+  const hh = String(endHours).padStart(2, "0");
+  const mm = String(endMinutes).padStart(2, "0");
+
+  return `${hh}:${mm}:00`;
+}
