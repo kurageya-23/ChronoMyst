@@ -89,7 +89,7 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
   }, [opened, initialValues]);
 
   return (
-    <Container my="lg">
+    <Container>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap={4}>
           {selectedEvent ? (

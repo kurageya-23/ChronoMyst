@@ -52,7 +52,7 @@ const ConfigModal: React.FC<ConfigModalProps> = ({ opened, onClose }) => {
       withinPortal
       title="設定"
     >
-      <Container my="lg">
+      <Container>
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap={4}>
             {/* 時間設定 */}
