@@ -68,6 +68,7 @@ function TimelinePage() {
                         fontSize: "12px",
                       },
                     }}
+                    disabled={!c.memo}
                   >
                     <Text
                       style={{
