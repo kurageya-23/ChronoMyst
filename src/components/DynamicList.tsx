@@ -1,4 +1,4 @@
-import { ActionIcon, Button, Group, Text } from "@mantine/core";
+import { ActionIcon, Button, Flex, Group, Text } from "@mantine/core";
 import { IconTrash } from "@tabler/icons-react";
 
 /**
@@ -29,7 +29,7 @@ export default function DynamicList<T>({
   return (
     <>
       {items.map((item, index) => (
-        <Group key={index} mt="xs" m="sm" align="center">
+        <Flex key={index} mt="xs" m="sm" align="center" gap={6}>
           {renderItem(item, index)}
           {/* 削除ボタンは items.length > min のときのみ表示 */}
           {canRemove && (
@@ -41,7 +41,7 @@ export default function DynamicList<T>({
               <IconTrash size={16} />
             </ActionIcon>
           )}
-        </Group>
+        </Flex>
       ))}
       {/* 追加ボタンは items.length < max のときのみ表示 */}
       {canAdd && (

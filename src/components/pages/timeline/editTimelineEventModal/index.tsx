@@ -89,7 +89,7 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
   }, [opened, initialValues]);
 
   return (
-    <Container my="lg">
+    <Container>
       <form onSubmit={form.onSubmit(handleSubmit)}>
         <Stack gap={4}>
           {selectedEvent ? (
@@ -218,21 +218,35 @@ const ListChipSelector: React.FC<ListChipSelectorProps> = ({
   data,
   value,
   onChange,
-}) => (
-  <>
-    <Stack gap={0}>
-      <Text size="sm" w={500} mb="xs">
-        {label}
-      </Text>
-      <Chip.Group multiple={multiple} value={value} onChange={onChange}>
-        <Group gap="xs" wrap="wrap">
-          {data.map((d) => (
-            <Chip key={d.value} value={d.value} color={d.color}>
-              {d.label}
-            </Chip>
-          ))}
-        </Group>
-      </Chip.Group>
-    </Stack>
-  </>
-);
+}) => {
+  const handleChipClick = (event: React.MouseEvent<HTMLInputElement>) => {
+    // 単一選択 & クリックされた値が既存の値と同じならクリア
+    if (!multiple && event.currentTarget.value === value) {
+      onChange("");
+    }
+  };
+
+  return (
+    <>
+      <Stack gap={0}>
+        <Text size="sm" w={500} mb="xs">
+          {label}
+        </Text>
+        <Chip.Group multiple={multiple} value={value} onChange={onChange}>
+          <Group gap="xs" wrap="wrap">
+            {data.map((d) => (
+              <Chip
+                key={d.value}
+                value={d.value}
+                color={d.color}
+                onClick={handleChipClick}
+              >
+                {d.label}
+              </Chip>
+            ))}
+          </Group>
+        </Chip.Group>
+      </Stack>
+    </>
+  );
+};

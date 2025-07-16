@@ -56,7 +56,7 @@ export default function EditCharacterMemoModal({
       withinPortal
       title={`${selectedCharacter?.name} のメモ`}
     >
-      <Container my="lg">
+      <Container>
         <form onSubmit={form.onSubmit(handleSubmit)}>
           <Stack gap={4}>
             {/* メモ */}

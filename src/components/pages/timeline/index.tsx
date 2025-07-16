@@ -54,7 +54,7 @@ function TimelinePage() {
         {/* タイムラインヘッダー */}
         <thead>
           <tr>
-            <th>Time</th>
+            <th></th>
             {config.characters.map((c) => (
               <th key={c.id}>
                 {/* キャラクター名 */}
@@ -68,6 +68,7 @@ function TimelinePage() {
                         fontSize: "12px",
                       },
                     }}
+                    disabled={!c.memo}
                   >
                     <Text
                       style={{
@@ -81,7 +82,7 @@ function TimelinePage() {
                   </Tooltip>
                   <ActionIcon
                     variant="filled"
-                    color="teal"
+                    color={c.color}
                     size="sm"
                     aria-label="Settings"
                     onClick={() => {
