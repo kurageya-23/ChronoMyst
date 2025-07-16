@@ -11,7 +11,7 @@ import {
   Stack,
   Select,
 } from "@mantine/core";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import { useForm } from "@mantine/form";
 import type { RootState } from "../../../../app/store";
 import { timelineSlice } from "../../../../features/timelines/timelineSlice";
@@ -55,14 +55,14 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
   onClose,
   selectedEvent,
 }) => {
-  const dispatch = useDispatch();
+  // ストアからシナリオ設定を取得
   const { config } = useSelector(
     (s: RootState) => s[timelineSlice.reducerPath]
   );
 
   // カスタムフックからロジックを取得
-  const { initialValues, buildPayload, finalizeTimelineEvent, useTimeOptions } =
-    useTimelineEvent(selectedEvent, config);
+  const { initialValues, useTimeOptions, handleSubmit, handleDelete } =
+    useTimelineEvent(selectedEvent, config, onClose);
 
   // 時間の選択肢
   const timeOptions = useTimeOptions({
@@ -70,8 +70,6 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
     timelineEndTime: config.timelineEndTime,
     interval: config.interval,
   });
-
-  console.log(timeOptions);
 
   // フォームデータ
   const form = useForm<TimelineEventFormData>({
@@ -89,29 +87,6 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [opened, initialValues]);
-
-  const handleSubmit = (values: typeof form.values) => {
-    const mapped = buildPayload(values);
-    const timelineEvent = finalizeTimelineEvent(mapped, !selectedEvent?.id);
-
-    if (selectedEvent?.id) {
-      dispatch(timelineSlice.actions.updateTimelineEvent(timelineEvent));
-    } else {
-      dispatch(timelineSlice.actions.createTimelineEvent(timelineEvent));
-    }
-    onClose();
-  };
-
-  /** イベントデータの削除 */
-  const handleDelete = (e: React.MouseEvent<HTMLButtonElement>) => {
-    // FIXME: formのsubmit発火を防止
-    e.preventDefault();
-
-    if (window.confirm("本当にこのイベントを削除しますか？" + form.values.id)) {
-      dispatch(timelineSlice.actions.deleteTimelineEvent(form.values.id));
-    }
-    onClose();
-  };
 
   return (
     <Container my="lg">
@@ -194,7 +169,7 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
           />
 
           {/* メモ */}
-          <TextareaInput form={form} />
+          <Textarea label="メモ" {...form.getInputProps("detail")} />
 
           <ColorInput
             label="カラー"
@@ -204,7 +179,11 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
           />
           {selectedEvent?.id ? (
             <Group justify="space-between" mt="md">
-              <Button type="button" color="red" onClick={handleDelete}>
+              <Button
+                type="button"
+                color="red"
+                onClick={(e) => handleDelete(form.values, e)}
+              >
                 削除
               </Button>
               <Button type="submit" color="indigo">
@@ -223,11 +202,6 @@ const ModalContent: React.FC<EditTimelineEventModalProps> = ({
     </Container>
   );
 };
-
-/** メモ */
-const TextareaInput: React.FC<{
-  form: ReturnType<typeof useForm<TimelineEventFormData>>;
-}> = ({ form }) => <Textarea label="メモ" {...form.getInputProps("detail")} />;
 
 /** Chip選択 */
 type ChipData = { value: string; label: string; color?: string };

@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import {
   assignTimelineEventId,
   calendarToForm,
@@ -25,39 +25,32 @@ import { COLOR_EVENT_DEFAULT } from "../../../app/appConstants";
  * @param config Timeline.config（characters, places 等）
  */
 export const useTimeline = (config: Timeline["config"]) => {
-  /** TODO: 重複しているので共通化 フォーム送信前にキャラクターと場所を解決 */
-  const buildPayload = useCallback(
-    (values: TimelineEventFormData): TimelineEventFormData => {
-      return solveTimelineEvent(values, config);
-    },
-    [config]
-  );
-
-  /** TODO: 重複しているので共通化 新規作成時はIDを補完するラッパー */
-  const finalizeTimelineEvent = useCallback(
-    (values: TimelineEventFormData, isNew: boolean): TimelineEvent => {
-      const formWithId = assignTimelineEventId(values, isNew);
-      return formToCalendar(formWithId);
-    },
-    []
-  );
-
   const dispatch = useDispatch();
+
+  /** TODO: 一度フォームデータにする必要は？ イベントデータの整形 */
+  const solveData = (
+    info: EventDropArg | EventResizeDoneArg
+  ): TimelineEvent => {
+    // フォームデータに変換
+    const ev = calendarToForm(info.event);
+    // 依存関係を解決
+    const mapped = solveTimelineEvent(ev, config);
+    // IDの新規採番
+    const formWithId = assignTimelineEventId(mapped, !event);
+    // カレンダーデータに戻す
+    return formToCalendar(formWithId);
+  };
 
   /** ドロップイベントハンドラ */
   const handleEventDrop = (info: EventDropArg) => {
-    const ev = calendarToForm(info.event);
-    const mapped = buildPayload(ev);
-    const timelineEvent = finalizeTimelineEvent(mapped, !event);
-    dispatch(timelineSlice.actions.updateTimelineEvent(timelineEvent));
+    const soleved = solveData(info);
+    dispatch(timelineSlice.actions.updateTimelineEvent(soleved));
   };
 
   /** リサイズイベントハンドラ */
   const handleEventResize = (info: EventResizeDoneArg) => {
-    const ev = calendarToForm(info.event);
-    const mapped = buildPayload(ev);
-    const timelineEvent = finalizeTimelineEvent(mapped, !event);
-    dispatch(timelineSlice.actions.updateTimelineEvent(timelineEvent));
+    const soleved = solveData(info);
+    dispatch(timelineSlice.actions.updateTimelineEvent(soleved));
   };
 
   /** タイムライン上の直接クリックイベントハンドラ */
@@ -104,8 +97,6 @@ export const useTimeline = (config: Timeline["config"]) => {
   };
 
   return {
-    buildPayload,
-    finalizeTimelineEvent,
     handleEventDrop,
     handleEventResize,
     handleClickTimeline,

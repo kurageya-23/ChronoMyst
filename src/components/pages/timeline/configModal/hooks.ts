@@ -4,11 +4,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { getTimeRange, isTimeAfter } from "@mantine/dates";
 import { timelineSlice } from "../../../../features/timelines/timelineSlice";
 import type { RootState } from "../../../../app/store";
-import { npcSample, type TimelineConfig } from "../../../../features/models";
+import { type TimelineConfig } from "../../../../features/models";
 import { configModalValidator } from "./validator";
 import { v4 as uuidv4 } from "uuid";
 import { useNextSort } from "../../../../features/utils/useNextSort";
-import { INTERVAL_MIN } from "../../../../app/appConstants";
+import { DEFAULT_NPC, INTERVAL_MIN } from "../../../../app/appConstants";
 import { computeEndTime } from "../../../../app/util";
 
 export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
@@ -115,7 +115,7 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
   const handleSubmit = useCallback(
     (values: TimelineConfig) => {
       // 証言者にはキャラクター+NPCを追加
-      values.witnesses = values.characters.concat([npcSample]);
+      values.witnesses = values.characters.concat([DEFAULT_NPC]);
 
       // endTimeにstartTime + timeAmountをセット
       values.timelineEndTime = computeEndTime(

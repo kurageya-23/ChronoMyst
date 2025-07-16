@@ -1,5 +1,7 @@
 /** システム全体の定数 */
 
+import type { Character, Place } from "../features/models";
+
 /** カレンダーの初期日付 */
 export const CALENDAR_INIT_DATE = "2025-05-24";
 
@@ -56,3 +58,56 @@ export const PLACE_MIN_COUNT = 0;
 export const PLACE_MAX_LENGTH = 30;
 /** 場所メモの最大文字数 */
 export const PLACE_MEMO_MAX_LENGTH = 100;
+
+/** -------サンプルデータ-------- */
+/** デフォルトのシナリオデータ */
+export const DEFAULT_SCENARIO = {
+  name: "無題",
+  memo: "シナリオのあらすじなど",
+};
+
+/** デフォルトのキャラクターデータ */
+export const DEFAULT_CHARACTERS = [
+  {
+    id: "1",
+    name: "キャラクターA",
+    playerName: "プレイヤーA",
+    memo: "年齢や性格などの基本情報",
+    color: "#fa5252",
+    sort: 1,
+  } as Character,
+  {
+    id: "2",
+    name: "キャラクターB",
+    playerName: "プレイヤーB",
+    memo: "年齢や性格などの基本情報",
+    color: "#fa5252",
+    sort: 2,
+  } as Character,
+  {
+    id: "3",
+    name: "キャラクターC",
+    playerName: "プレイヤーC",
+    memo: "年齢や性格などの基本情報",
+    color: "#fa5252",
+    sort: 3,
+  } as Character,
+];
+
+/** デフォルトの場所データ */
+export const DEFAULT_PLACES = [
+  { id: "1", name: "エントランス", memo: "", sort: 1 } as Place,
+  { id: "2", name: "調理室", memo: "", sort: 2 } as Place,
+  { id: "3", name: "倉庫", memo: "", sort: 3 } as Place,
+];
+
+/** デフォルトのNPCデータ */
+export const DEFAULT_NPC = {
+  id: "character-npc",
+  name: "NPC",
+  color: "#868e96",
+  sort: 99,
+} as Character;
+
+/** デフォルトの証言者データ */
+export const DEFAULT_WITNESS = DEFAULT_CHARACTERS.concat(DEFAULT_NPC);

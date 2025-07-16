@@ -1,8 +1,5 @@
-// src/hooks/useTimelineEvent.ts
-import { useMemo, useCallback } from "react";
-
+import { useMemo } from "react";
 import {
-  type TimelineEvent,
   type Timeline,
   type TimelineEventFormData,
   solveTimelineEvent,
@@ -11,38 +8,55 @@ import {
   formToCalendar,
 } from "../../../../features/models";
 import { CALENDAR_INIT_DATE } from "../../../../app/appConstants";
+import { useDispatch } from "react-redux";
+import { timelineSlice } from "../../../../features/timelines/timelineSlice";
 
 /**
  * カスタムフック
- * @param event 選択中の EventApi または null
+ * @param selectedEvent 選択中の EventApi または null
  * @param config Timeline.config（characters, places 等）
  */
 export const useTimelineEvent = (
-  event: TimelineEventFormData | null,
-  config: Timeline["config"]
+  selectedEvent: TimelineEventFormData | null,
+  config: Timeline["config"],
+  onClose: () => void
 ) => {
-  // 1. 初期値をメモ化
+  // 初期値をメモ化
   const initialValues: TimelineEventFormData = useMemo(() => {
-    console.log("useTimelineEvent:event", event, config);
-    return event!;
-  }, [event]);
+    return selectedEvent!;
+  }, [selectedEvent]);
 
-  // TODO: 重複しているので共通化 2. フォーム送信前にキャラクターと場所を解決
-  const buildPayload = useCallback(
-    (values: TimelineEventFormData): TimelineEventFormData => {
-      return solveTimelineEvent(values, config);
-    },
-    [config]
-  );
+  const dispatch = useDispatch();
 
-  // TODO: 重複しているので共通化 3. 新規作成時はIDを補完するラッパー
-  const finalizeTimelineEvent = useCallback(
-    (values: TimelineEventFormData, isNew: boolean): TimelineEvent => {
-      const formWithId = assignTimelineEventId(values, isNew);
-      return formToCalendar(formWithId);
-    },
-    []
-  );
+  /** フォームデータの送信 */
+  const handleSubmit = (values: TimelineEventFormData) => {
+    // 依存関係を解決
+    const mapped = solveTimelineEvent(values, config);
+    // IDの新規採番
+    const formWithId = assignTimelineEventId(mapped, !selectedEvent?.id);
+    // イベントデータに変換
+    const soleved = formToCalendar(formWithId);
+    if (selectedEvent?.id) {
+      dispatch(timelineSlice.actions.updateTimelineEvent(soleved));
+    } else {
+      dispatch(timelineSlice.actions.createTimelineEvent(soleved));
+    }
+    onClose();
+  };
+
+  /** イベントデータの削除 */
+  const handleDelete = (
+    values: TimelineEventFormData,
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    // FIXME: formのsubmit発火を防止
+    e.preventDefault();
+
+    if (window.confirm("本当にこのイベントを削除しますか？" + values.id)) {
+      dispatch(timelineSlice.actions.deleteTimelineEvent(values.id));
+    }
+    onClose();
+  };
 
   type TimeItem = { value: string; label: string };
   type GroupedTimeOptions = {
@@ -112,8 +126,8 @@ export const useTimelineEvent = (
 
   return {
     initialValues,
-    buildPayload,
-    finalizeTimelineEvent,
     useTimeOptions,
+    handleSubmit,
+    handleDelete,
   };
 };

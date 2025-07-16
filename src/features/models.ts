@@ -171,19 +171,23 @@ export const solveTimelineEvent = (
   values: TimelineEventFormData,
   config: TimelineConfig
 ): TimelineEventFormData => {
+  // 証言者
   const witness = config.witnesses.find(
     (w: Character) => w.id === values.witnessId
   )!;
+  // キャラクター
   const characters = values.characterIds
     .map(
       (id: string) =>
         config.characters.find((c: Character) => String(c.id) === id)!
     )
     .filter(Boolean);
+  // 場所
   const place = config.places.find((p: Place) => p.id === values.placeId)!;
   return { ...values, witness, characters, place };
 };
 
+/** 新規のイベントIDを採番します */
 export const assignTimelineEventId = (
   values: TimelineEventFormData,
   isNew: boolean
@@ -194,50 +198,3 @@ export const assignTimelineEventId = (
       : values;
   return formWithId;
 };
-
-/** -------サンプルデータ-------- */
-// キャラクターデータのサンプル
-export const charactersSample = [
-  {
-    id: "1",
-    name: "キャラクターA",
-    playerName: "プレイヤーA",
-    memo: "つよそう",
-    color: "#fa5252",
-    sort: 1,
-  } as Character,
-  {
-    id: "2",
-    name: "キャラクターB",
-    playerName: "プレイヤーB",
-    memo: "よわそう",
-    color: "#fa5252",
-    sort: 2,
-  } as Character,
-  {
-    id: "3",
-    name: "キャラクターC",
-    playerName: "プレイヤーC",
-    memo: "かわいい",
-    color: "#fa5252",
-    sort: 3,
-  } as Character,
-];
-
-// 場所データのサンプル
-export const placesSample = [
-  { id: "1", name: "エントランス", memo: "", sort: 1 } as Place,
-  { id: "2", name: "調理室", memo: "", sort: 2 } as Place,
-  { id: "3", name: "倉庫", memo: "", sort: 3 } as Place,
-];
-
-// NPCデータのサンプル
-export const npcSample = {
-  id: "character-npc",
-  name: "NPC",
-  color: "#868e96",
-  sort: 99,
-} as Character;
-
-// 証言者データのサンプル
-export const witnessesSample = charactersSample.concat(npcSample);
