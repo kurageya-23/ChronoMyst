@@ -1,15 +1,31 @@
+.mantine-AppShell-main {
+  padding-top: 44px !important;
+}
+
 /* タイムラインテーブルの設定 */
+/* 動的に外部ヘッダー/フッター分を引いた高さを設定 */
+/* --header-height, --footer-height を上位で定義すると自動反映 */
 .timeline-container {
   width: 100%;
   height: 100%;
-  overflow: auto; /* 横にも縦にもスクロール */
+  height: calc(100vh - var(--header-height, 64px) - var(--footer-height, 0px));
+  overflow-y: auto;
 }
 
 .timeline-table {
-  border-collapse: collapse;
   table-layout: fixed; /* colgroup の幅を厳密に適用 */
-  width: auto; /* col の合計幅に合わせる */
+  width: 100; /* col の合計幅に合わせる */
   max-width: 100%;
+  border-collapse: collapse;
+}
+
+/* ヘッダー行をスクロール領域上部に固定 */
+.timeline-table thead th {
+  position: sticky;
+  top: 0;
+  z-index: 3; /* 必要に応じ調整 */
+  background-color: #242424;
+  border: none;
 }
 
 .timeline-table th,
@@ -19,19 +35,13 @@
   margin: 0;
 }
 
-/* ヘッダー行を上部に貼り付け */
-.timeline-table thead th {
-  position: sticky;
-  top: 0;
-  z-index: 3;
-}
-
-/* 左端（time列）を固定 */
-.timeline-table thead th:first-child,
-.timeline-table tbody td:first-child {
+/* 最左列を水平方向に固定 */
+.timeline-table th:first-child,
+.timeline-table td:first-child {
   position: sticky;
   left: 0;
-  z-index: 2;
+  background-color: #242424;
+  border-left-color: #242424;
 }
 
 .fc .fc-timegrid-slot {
@@ -59,6 +69,19 @@
 .axis-only .fc .fc-timegrid-slot-label {
   vertical-align: top;
   font-size: 14px;
+}
+
+/* セル内 FullCalendar を親セルいっぱいに伸ばす */
+.axis-only .fc,
+.character-timeline .fc {
+  height: 100% !important;
+}
+
+/* 表示崩れ防止のため各セルを縦にも伸長 */
+.axis-only,
+.character-timeline {
+  height: calc(100vh - var(--header-height, 64px) - var(--footer-height, 0px));
+  padding: 0;
 }
 
 /** 各キャラクターのFullCalendarコンテナ */

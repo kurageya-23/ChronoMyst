@@ -54,7 +54,7 @@ function TimelinePage() {
         {/* タイムラインヘッダー */}
         <thead>
           <tr>
-            <th>Time</th>
+            <th></th>
             {config.characters.map((c) => (
               <th key={c.id}>
                 {/* キャラクター名 */}
