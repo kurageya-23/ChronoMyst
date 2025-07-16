@@ -1,5 +1,5 @@
 /** FullCalendarイベントのカスタムコンポーネント */
-import { Badge, Group, Text, Tooltip } from "@mantine/core";
+import { Badge, Flex, Group, Text, Tooltip } from "@mantine/core";
 import type { ExtendedCalenderEventProp } from "../features/models";
 import { IconMapPin, IconSpeakerphone } from "@tabler/icons-react";
 
@@ -10,11 +10,11 @@ const CustomTimelineEvent = (eventInfo: any) => {
 
   return (
     <>
-      <Group justify="space-between">
+      <Flex justify="space-between">
         {/* 時間 */}
         <Text size="8px">{timeText}</Text>
 
-        <Group justify="flex-end" gap={4}>
+        <Flex direction="column" gap={2}>
           {/* 証言者 */}
           {extendProps.witness?.name && (
             <Badge
@@ -40,8 +40,8 @@ const CustomTimelineEvent = (eventInfo: any) => {
               {extendProps.place?.name}
             </Badge>
           )}
-        </Group>
-      </Group>
+        </Flex>
+      </Flex>
 
       <Group>
         {/* メモ */}
