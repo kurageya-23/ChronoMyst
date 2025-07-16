@@ -23,34 +23,9 @@ export const configModalValidator: FormValidateInput<TimelineConfig> = {
     return null;
   },
   // 開始時刻
-  startTime: (value: string, values: TimelineConfig) => {
+  timelineStartTime: (value: string) => {
     if (!value) {
       return "必須項目です";
-    }
-
-    // 日またぎシナリオかつ終了時間がセットされていれば「開始 < 終了」をチェック
-    if (values.days <= 1 && values.endTime) {
-      const [sh, sm] = value.split(":").map(Number);
-      const [eh, em] = values.endTime.split(":").map(Number);
-      if (sh * 60 + sm >= eh * 60 + em) {
-        return "開始時間は終了時間より前にしてください";
-      }
-    }
-    return null;
-  },
-  // 終了時刻
-  endTime: (value: string, values: TimelineConfig) => {
-    if (!value) {
-      return "必須項目です";
-    }
-
-    // 日またぎシナリオかつ開始時間がセットされていれば「開始 < 終了」をチェック
-    if (values.days <= 1 && values.startTime) {
-      const [sh, sm] = values.startTime.split(":").map(Number);
-      const [eh, em] = value.split(":").map(Number);
-      if (sh * 60 + sm >= eh * 60 + em) {
-        return "終了時間は開始時間より後にしてください";
-      }
     }
     return null;
   },

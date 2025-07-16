@@ -65,6 +65,7 @@ export const useLayout = () => {
 
         // 成功 → Reduxへ投入
         const json = parsed as TimelineJson;
+
         dispatch(timelineSlice.actions.jsonImport(json.data));
       } catch (err: any) {
         alert(`ファイルの読み込みに失敗しました: ${err.message}`);

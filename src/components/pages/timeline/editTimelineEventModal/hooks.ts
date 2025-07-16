@@ -1,115 +1,133 @@
-// src/hooks/useTimelineEvent.ts
-import { useMemo, useCallback } from "react";
-
+import { useMemo } from "react";
 import {
-  type Place,
-  type TimelineEvent,
   type Timeline,
   type TimelineEventFormData,
   solveTimelineEvent,
   assignTimelineEventId,
-  type Character,
+  type TimelineConfig,
+  formToCalendar,
 } from "../../../../features/models";
-import { COLOR_EVENT_DEFAULT } from "../../../../app/appConstants";
+import { CALENDAR_INIT_DATE } from "../../../../app/appConstants";
+import { useDispatch } from "react-redux";
+import { timelineSlice } from "../../../../features/timelines/timelineSlice";
 
 /**
  * カスタムフック
- * @param event 選択中の EventApi または null
+ * @param selectedEvent 選択中の EventApi または null
  * @param config Timeline.config（characters, places 等）
  */
 export const useTimelineEvent = (
-  event: TimelineEventFormData | null,
-  config: Timeline["config"]
+  selectedEvent: TimelineEventFormData | null,
+  config: Timeline["config"],
+  onClose: () => void
 ) => {
-  // 1. 初期値をメモ化
+  // 初期値をメモ化
   const initialValues: TimelineEventFormData = useMemo(() => {
-    if (event?.id) return event;
-    if (event?.startTime) return event;
+    return selectedEvent!;
+  }, [selectedEvent]);
 
-    return {
-      id: "",
-      startTime: "",
-      endTime: "",
-      days: "1",
-      detail: "",
-      color: COLOR_EVENT_DEFAULT,
-      witnessId: "",
-      witness: {} as Character,
-      characterIds: [],
-      characters: [],
-      placeId: "",
-      place: {} as Place,
-    };
-  }, [event]);
+  const dispatch = useDispatch();
 
-  // 2. フォーム送信前にキャラクターと場所を解決
-  const buildPayload = useCallback(
-    (values: TimelineEventFormData): TimelineEventFormData => {
-      return solveTimelineEvent(values, config);
-    },
-    [config]
-  );
-
-  // 3. 新規作成時はIDを補完するラッパー
-  const finalizeTimelineEvent = useCallback(
-    (values: TimelineEventFormData, isNew: boolean): TimelineEvent => {
-      return assignTimelineEventId(values, isNew);
-    },
-    []
-  );
-
-  /** 開始時間、終了時間TimeInputのプリセットを生成 */
-  const getTimePresets = (days: number) => {
-    const toMinutes = (hm: string) => {
-      const [h, m] = hm.split(":").map(Number);
-      return h * 60 + m;
-    };
-    const toHmString = (min: number) => {
-      const h = Math.floor(min / 60);
-      const m = min % 60;
-      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}`;
-    };
-
-    const startMin = toMinutes(config.startTime);
-    const endMin = toMinutes(config.endTime);
-    const stepMin = toMinutes(config.interval);
-    const fullStart = toMinutes("00:00");
-    const fullEnd = toMinutes("24:00"); // 1440 分
-
-    const times: string[] = [];
-    // 1日表示 or 単一日モード
-    if (config.days <= 1) {
-      for (let t = startMin; t <= endMin; t += stepMin) {
-        times.push(toHmString(t));
-      }
-      return times;
-    }
-
-    // 複数日モード
-    if (days === 1) {
-      // 1日目: startTime → 24:00
-      for (let t = startMin; t <= fullEnd; t += stepMin) {
-        times.push(toHmString(t));
-      }
-    } else if (days === config.days) {
-      // 最終日: 00:00 → endTime
-      for (let t = fullStart; t <= endMin; t += stepMin) {
-        times.push(toHmString(t));
-      }
+  /** フォームデータの送信 */
+  const handleSubmit = (values: TimelineEventFormData) => {
+    // 依存関係を解決
+    const mapped = solveTimelineEvent(values, config);
+    // IDの新規採番
+    const formWithId = assignTimelineEventId(mapped, !selectedEvent?.id);
+    // イベントデータに変換
+    const soleved = formToCalendar(formWithId);
+    if (selectedEvent?.id) {
+      dispatch(timelineSlice.actions.updateTimelineEvent(soleved));
     } else {
-      // 中間日: 00:00 → 24:00
-      for (let t = fullStart; t <= fullEnd; t += stepMin) {
-        times.push(toHmString(t));
-      }
+      dispatch(timelineSlice.actions.createTimelineEvent(soleved));
     }
+    onClose();
+  };
 
-    return times;
+  /** イベントデータの削除 */
+  const handleDelete = (
+    values: TimelineEventFormData,
+    e: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    // FIXME: formのsubmit発火を防止
+    e.preventDefault();
+
+    if (window.confirm("本当にこのイベントを削除しますか？" + values.id)) {
+      dispatch(timelineSlice.actions.deleteTimelineEvent(values.id));
+    }
+    onClose();
+  };
+
+  type TimeItem = { value: string; label: string };
+  type GroupedTimeOptions = {
+    group: string;
+    items: TimeItem[];
+  }[];
+
+  const useTimeOptions = (
+    config: Pick<
+      TimelineConfig,
+      "timelineStartTime" | "timelineEndTime" | "interval"
+    >
+  ): GroupedTimeOptions => {
+    return useMemo<GroupedTimeOptions>(() => {
+      // "HH:mm" → 分
+      const toMinutes = (hm: string) => {
+        const [h, m] = hm.split(":").map(Number);
+        return h * 60 + m;
+      };
+
+      const startMin = toMinutes(config.timelineStartTime);
+      const endMin = toMinutes(config.timelineEndTime);
+      const stepMin = toMinutes(config.interval);
+
+      // カレンダー初期日付の午夜をベースにする
+      const baseDate = new Date(`${CALENDAR_INIT_DATE}T00:00:00`);
+
+      type Flat = { group: string; value: string; label: string };
+      const flat: Flat[] = [];
+
+      for (let t = startMin; t <= endMin; t += stepMin) {
+        const rawH = Math.floor(t / 60);
+        const m = t % 60;
+        const labelH = rawH % 24;
+        const hh = String(labelH).padStart(2, "0");
+        const mm = String(m).padStart(2, "0");
+
+        // 何日目か = (rawH / 24 の切り捨て) + 1
+        const dayNum = Math.floor(rawH / 24) + 1;
+        const group = `${dayNum}日目`;
+        const label = `${hh}:${mm}`;
+
+        // baseDate をコピーして日数をずらす
+        const dt = new Date(baseDate);
+        dt.setDate(dt.getDate() + (dayNum - 1));
+        // 時刻をセット
+        dt.setHours(labelH, m, 0, 0);
+
+        // ローカル時刻を ISO UTC 文字列に
+        const value = dt.toISOString();
+
+        flat.push({ group, value, label });
+      }
+
+      // グループ化して返却
+      const map = new Map<string, TimeItem[]>();
+      flat.forEach(({ group, value, label }) => {
+        if (!map.has(group)) {
+          map.set(group, []);
+        }
+        map.get(group)!.push({ value, label });
+      });
+
+      return Array.from(map, ([group, items]) => ({ group, items }));
+    }, [config.timelineStartTime, config.timelineEndTime, config.interval]);
   };
 
   return {
     initialValues,
-    buildPayload,
-    finalizeTimelineEvent,
-    getTimePresets,
+    useTimeOptions,
+    handleSubmit,
+    handleDelete,
   };
 };
