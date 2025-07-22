@@ -7,6 +7,8 @@ import {
   Button,
   Menu,
   Flex,
+  ActionIcon,
+  Stack,
 } from "@mantine/core";
 import { useDispatch } from "react-redux";
 import { Outlet } from "react-router-dom";
@@ -16,11 +18,15 @@ import { useDisclosure } from "@mantine/hooks";
 import {
   IconAdjustments,
   IconBookFilled,
+  IconBug,
   IconFileExport,
   IconFileImport,
+  IconMap,
 } from "@tabler/icons-react";
 import ConfigModal from "../pages/timeline/configModal";
 import { useLayout } from "./hooks";
+import MapView from "../pages/map";
+import DebugView from "../pages/debug";
 
 export const Layout = () => {
   const {
@@ -43,8 +49,22 @@ export const Layout = () => {
     { open: configModalOpen, close: configModalClose },
   ] = useDisclosure(false);
 
+  // マップドロワー
+  const [mapOpened, { open: openMap, close: closeMap }] = useDisclosure(false);
+
+  // デバッグドロワー
+  const [debugOpened, { open: openDebug, close: closeDebug }] =
+    useDisclosure(false);
+
   return (
-    <AppShell header={{ height: 40 }} padding="sm">
+    <AppShell
+      header={{ height: 40 }}
+      padding="sm"
+      navbar={{
+        width: 40,
+        breakpoint: "sm",
+      }}
+    >
       {/* ヘッダーメニュー */}
       <AppShell.Header>
         <Grid h="100%" justify="space-between" align="center" px="lg">
@@ -95,7 +115,32 @@ export const Layout = () => {
           </Grid.Col>
         </Grid>
       </AppShell.Header>
+      {/* サイドメニュー */}
+      <AppShell.Navbar p="xs">
+        <Stack justify="center">
+          <ActionIcon
+            variant="subtle"
+            size="sm"
+            color="#ffffff"
+            aria-label="maps"
+            onClick={openMap}
+          >
+            <IconMap />
+          </ActionIcon>
+          <ActionIcon
+            variant="subtle"
+            size="sm"
+            color="#ffffff"
+            aria-label="debug"
+            onClick={openDebug}
+          >
+            <IconBug />
+          </ActionIcon>
+        </Stack>
+      </AppShell.Navbar>
       <AppShell.Main>
+        <MapView opened={mapOpened} onClose={closeMap} />
+        <DebugView opened={debugOpened} onClose={closeDebug} />
         <Outlet />
         <ConfigModal opened={isConfigModalOpen} onClose={configModalClose} />
       </AppShell.Main>

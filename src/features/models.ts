@@ -118,6 +118,22 @@ export type TimelineJson = {
   data: Timeline;
 };
 
+/** ******** マップ関連 ******** */
+export type MapData = {
+  mapImage: string;
+  mapMarkers: MapMarker[];
+};
+
+/** マップマーカーの位置 */
+export type MapMarkerPos = { x: number; y: number };
+
+/** マップマーカー */
+export type MapMarker = {
+  placeId: string;
+  place: Place | undefined;
+  pos: MapMarkerPos;
+};
+
 /** --------モデルに関する処理-------- */
 /** FullCalendar EventApi → フォームの型 */
 export const calendarToForm = (event: EventApi): TimelineEventFormData => {
