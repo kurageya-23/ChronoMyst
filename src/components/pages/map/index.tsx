@@ -1,18 +1,10 @@
-import {
-  ActionIcon,
-  Drawer,
-  Fieldset,
-  Group,
-  Stack,
-  Tooltip,
-} from "@mantine/core";
+import { ActionIcon, Drawer, Group, Stack, Tooltip } from "@mantine/core";
 import { IconExchangeFilled } from "@tabler/icons-react";
 import { useMapView } from "./hooks";
-import { useRef } from "react";
-import type { MapData, MapMarker, Place } from "../../../features/models";
+import { useRef, useState } from "react";
 import { MapImageDropZone } from "./mapImageDropzone";
-import { MapPlaceBadge } from "./mapPlaceBadge";
-import { MapMarkerBadge } from "./mapMarkerBadge";
+import { MapContainer } from "./mapContainer";
+import { SizeSelector } from "../../SizeSelector";
 
 export type MapViewProps = {
   opened: boolean;
@@ -22,15 +14,9 @@ export type MapViewProps = {
 export default function MapView({ opened, onClose }: MapViewProps) {
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const dropzoneOpenRef = useRef<() => void>(null);
-  const {
-    mapData,
-    unselectedPlaces,
-    onFileDrop,
-    handlePlaceDrag,
-    handleDrop,
-    handleMarkerDelete,
-    handleMarkerMoveStart,
-  } = useMapView(imageContainerRef);
+  const { mapData, onFileDrop } = useMapView(imageContainerRef);
+
+  const [markerSize, setMarkerSize] = useState<string>("md");
 
   return (
     <Drawer opened={opened} onClose={onClose} size="70%" title="マップ">
@@ -44,27 +30,30 @@ export default function MapView({ opened, onClose }: MapViewProps) {
 
       {mapData.mapImage ? (
         <Stack gap={2}>
-          <Tooltip label="マップ画像の変更">
-            <ActionIcon
-              variant="subtle"
-              size="sm"
-              color="#ffffff"
-              aria-label="maps"
-              onClick={() => dropzoneOpenRef.current?.()}
-            >
-              <IconExchangeFilled />
-            </ActionIcon>
-          </Tooltip>
+          <Group>
+            {/* マップ画像変更アイコン */}
+            <Tooltip label="マップ画像の変更">
+              <ActionIcon
+                variant="subtle"
+                size="sm"
+                color="#ffffff"
+                aria-label="maps"
+                onClick={() => dropzoneOpenRef.current?.()}
+              >
+                <IconExchangeFilled />
+              </ActionIcon>
+            </Tooltip>
+
+            {/* マーカーサイズ変更 */}
+            <SizeSelector
+              value={markerSize}
+              onChange={(v) => setMarkerSize(v ?? "md")}
+              tooltip="マーカーサイズ"
+            />
+          </Group>
+
           {/* マップ画像ビュー */}
-          <MapImageView
-            imageContainerRef={imageContainerRef}
-            mapData={mapData}
-            unselectedPlaces={unselectedPlaces}
-            handlePlaceDrag={handlePlaceDrag}
-            handleMoveStart={handleMarkerMoveStart}
-            handleDrop={handleDrop}
-            handleDelete={handleMarkerDelete}
-          />
+          <MapContainer markerSize={markerSize} />
         </Stack>
       ) : (
         <></>
@@ -72,66 +61,3 @@ export default function MapView({ opened, onClose }: MapViewProps) {
     </Drawer>
   );
 }
-
-type MapImageViewProps = {
-  imageContainerRef: React.RefObject<HTMLDivElement | null>;
-  mapData: MapData;
-  unselectedPlaces: Place[];
-  handlePlaceDrag: (p: Place) => (e: React.MouseEvent) => void;
-  handleDrop: (e: React.DragEvent) => void;
-  handleDelete: (placeId: string) => void;
-  handleMoveStart: (m: MapMarker) => (e: React.MouseEvent) => void;
-};
-/** マップ画像ビュー */
-const MapImageView: React.FC<MapImageViewProps> = ({
-  imageContainerRef,
-  mapData,
-  unselectedPlaces,
-  handlePlaceDrag,
-  handleDrop,
-  handleDelete,
-  handleMoveStart,
-}: MapImageViewProps) => {
-  return (
-    <Stack>
-      {/* 画像コンテナ */}
-      <div
-        ref={imageContainerRef}
-        onDragOver={(e) => e.preventDefault()}
-        onDrop={handleDrop}
-        style={{
-          position: "relative",
-          display: "inline-block",
-          cursor: "crosshair",
-          maxWidth: "100%",
-        }}
-      >
-        {/* 画像 */}
-        <img
-          src={mapData.mapImage}
-          alt="preview"
-          style={{ display: "block", maxWidth: "100%" }}
-        />
-
-        {/* 場所マーカー */}
-        {mapData.mapMarkers.map((m) => (
-          <MapMarkerBadge
-            key={m.placeId}
-            marker={m}
-            handleDelete={() => handleDelete(m.placeId)}
-            handleMoveStart={handleMoveStart}
-          />
-        ))}
-      </div>
-
-      {/* 場所のマーカーリスト */}
-      <Fieldset legend="場所マーカー" p="xs">
-        <Group>
-          {unselectedPlaces.map((p) => (
-            <MapPlaceBadge key={p.id} place={p} handleDrag={handlePlaceDrag} />
-          ))}
-        </Group>
-      </Fieldset>
-    </Stack>
-  );
-};
