@@ -17,6 +17,8 @@ export const MapMarkerComponent: React.FC<MapMarkerComponentProps> = ({
   marker,
   size,
 }) => {
+  console.log("[bugfix]marker:", marker);
+
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: marker.placeId,
   });
@@ -36,6 +38,17 @@ export const MapMarkerComponent: React.FC<MapMarkerComponentProps> = ({
         zIndex: 999,
       }
     : {};
+
+  console.log("[bugfix]alibiAll:", alibiAll);
+  console.log("[bugfix]alibi:", alibi);
+  console.log("[bugfix]mapData", mapData);
+  console.log(
+    "[bugfix]attributes, listeners, setNodeRef, transform",
+    attributes,
+    listeners,
+    setNodeRef,
+    transform
+  );
 
   return (
     <div
