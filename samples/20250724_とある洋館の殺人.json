@@ -1,0 +1,558 @@
+﻿{
+  "appName": "chrono-myst",
+  "version": "0.0.2",
+  "data": {
+    "scenario": {
+      "name": "とある洋館の殺人",
+      "memo": "シナリオのあらすじなど"
+    },
+    "timelineEvents": [
+      {
+        "id": "2cfdf688-910a-4809-8a35-dd0a607e65db",
+        "title": "全員で夕食を食べた",
+        "start": "2025-05-24T11:00:00.000Z",
+        "end": "2025-05-24T12:00:00.000Z",
+        "borderColor": "#7950f2",
+        "backgroundColor": "#7950f2",
+        "extendedProps": {
+          "characters": [
+            {
+              "id": "1",
+              "name": "一宮",
+              "playerName": "○○",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#fa5252",
+              "sort": 1
+            },
+            {
+              "id": "2",
+              "name": "二宮",
+              "playerName": "△△",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#fab005",
+              "sort": 2
+            },
+            {
+              "id": "3",
+              "name": "三宮",
+              "playerName": "□□",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#12b886",
+              "sort": 3
+            },
+            {
+              "id": "b46a4732-32da-4544-9a1a-bf007c92cc1c",
+              "name": "零士",
+              "playerName": "××",
+              "color": "#868e96",
+              "memo": "",
+              "sort": 4
+            }
+          ],
+          "place": {
+            "id": "2",
+            "name": "大広間",
+            "memo": "",
+            "sort": 2
+          }
+        }
+      },
+      {
+        "id": "c441014e-627d-4a8b-bcae-b2b72d5481a9",
+        "title": "車で館に到着\n零士が大広間で出迎え",
+        "start": "2025-05-24T09:00:00.000Z",
+        "end": "2025-05-24T10:00:00.000Z",
+        "borderColor": "#7950f2",
+        "backgroundColor": "#7950f2",
+        "extendedProps": {
+          "characters": [
+            {
+              "id": "1",
+              "name": "一宮",
+              "playerName": "○○",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#fa5252",
+              "sort": 1
+            },
+            {
+              "id": "b46a4732-32da-4544-9a1a-bf007c92cc1c",
+              "name": "零士",
+              "playerName": "××",
+              "color": "#868e96",
+              "memo": "",
+              "sort": 4
+            }
+          ],
+          "place": {
+            "id": "2",
+            "name": "大広間",
+            "memo": "",
+            "sort": 2
+          }
+        }
+      },
+      {
+        "id": "b5d1d57a-ebec-4347-8d79-f9243677e51e",
+        "title": "車で館に到着\n零士が大広間で出迎え",
+        "start": "2025-05-24T10:00:00.000Z",
+        "end": "2025-05-24T11:00:00.000Z",
+        "borderColor": "#7950f2",
+        "backgroundColor": "#7950f2",
+        "extendedProps": {
+          "characters": [
+            {
+              "id": "2",
+              "name": "二宮",
+              "playerName": "△△",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#fab005",
+              "sort": 2
+            },
+            {
+              "id": "3",
+              "name": "三宮",
+              "playerName": "□□",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#12b886",
+              "sort": 3
+            },
+            {
+              "id": "b46a4732-32da-4544-9a1a-bf007c92cc1c",
+              "name": "零士",
+              "playerName": "××",
+              "color": "#868e96",
+              "memo": "",
+              "sort": 4
+            }
+          ],
+          "place": {
+            "id": "2",
+            "name": "大広間",
+            "memo": "",
+            "sort": 2
+          }
+        }
+      },
+      {
+        "id": "a68c3690-fc97-47e0-8bf1-a72876c1bc75",
+        "title": "探し物をしていた",
+        "start": "2025-05-24T10:00:00.000Z",
+        "end": "2025-05-24T11:00:00.000Z",
+        "borderColor": "#fd7e14",
+        "backgroundColor": "#fd7e14",
+        "extendedProps": {
+          "characters": [
+            {
+              "id": "1",
+              "name": "一宮",
+              "playerName": "○○",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#fa5252",
+              "sort": 1
+            }
+          ],
+          "place": {
+            "id": "1",
+            "name": "零士の書斎",
+            "memo": "",
+            "sort": 1
+          }
+        }
+      },
+      {
+        "id": "02426958-ada4-4a05-b3c4-c781c29be94a",
+        "title": "二宮が書斎を尋ねたところ、死体発見",
+        "start": "2025-05-24T14:00:00.000Z",
+        "end": "2025-05-24T15:00:00.000Z",
+        "borderColor": "#7950f2",
+        "backgroundColor": "#7950f2",
+        "extendedProps": {
+          "characters": [
+            {
+              "id": "b46a4732-32da-4544-9a1a-bf007c92cc1c",
+              "name": "零士",
+              "playerName": "××",
+              "color": "#868e96",
+              "memo": "",
+              "sort": 4
+            },
+            {
+              "id": "3",
+              "name": "三宮",
+              "playerName": "□□",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#12b886",
+              "sort": 3
+            },
+            {
+              "id": "2",
+              "name": "二宮",
+              "playerName": "△△",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#fab005",
+              "sort": 2
+            },
+            {
+              "id": "1",
+              "name": "一宮",
+              "playerName": "○○",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#fa5252",
+              "sort": 1
+            }
+          ],
+          "place": {
+            "id": "1",
+            "name": "零士の書斎",
+            "memo": "",
+            "sort": 1
+          }
+        }
+      },
+      {
+        "id": "0c439bfb-dcc1-46c1-bdda-8938d0d8aa68",
+        "title": "一宮が入室し、口論に",
+        "start": "2025-05-24T13:00:00.000Z",
+        "end": "2025-05-24T14:00:00.000Z",
+        "borderColor": "#fa5252",
+        "backgroundColor": "#fa5252",
+        "extendedProps": {
+          "characters": [
+            {
+              "id": "b46a4732-32da-4544-9a1a-bf007c92cc1c",
+              "name": "零士",
+              "playerName": "××",
+              "color": "#868e96",
+              "memo": "",
+              "sort": 4
+            },
+            {
+              "id": "1",
+              "name": "一宮",
+              "playerName": "○○",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#fa5252",
+              "sort": 1
+            }
+          ],
+          "place": {
+            "id": "1",
+            "name": "零士の書斎",
+            "memo": "",
+            "sort": 1
+          }
+        }
+      },
+      {
+        "id": "c3a8028e-edd8-43e2-9ced-eb9240976556",
+        "title": "客室で読書",
+        "start": "2025-05-24T13:00:00.000Z",
+        "end": "2025-05-24T14:00:00.000Z",
+        "borderColor": "#fd7e14",
+        "backgroundColor": "#fd7e14",
+        "extendedProps": {
+          "witness": {
+            "id": "2",
+            "name": "二宮",
+            "playerName": "△△",
+            "memo": "年齢や性格などの基本情報",
+            "color": "#fab005",
+            "sort": 2
+          },
+          "characters": [
+            {
+              "id": "2",
+              "name": "二宮",
+              "playerName": "△△",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#fab005",
+              "sort": 2
+            }
+          ],
+          "place": {
+            "id": "8644afc9-04d8-43e6-a7ac-fa2f7b64c3e2",
+            "name": "二宮の部屋",
+            "memo": "",
+            "sort": 7
+          }
+        }
+      },
+      {
+        "id": "368582c4-2058-4ee9-b8c7-2c6d38d52fa3",
+        "title": "客室で電話",
+        "start": "2025-05-24T13:00:00.000Z",
+        "end": "2025-05-24T14:00:00.000Z",
+        "borderColor": "#fd7e14",
+        "backgroundColor": "#fd7e14",
+        "extendedProps": {
+          "witness": {
+            "id": "3",
+            "name": "三宮",
+            "playerName": "□□",
+            "memo": "年齢や性格などの基本情報",
+            "color": "#12b886",
+            "sort": 3
+          },
+          "characters": [
+            {
+              "id": "3",
+              "name": "三宮",
+              "playerName": "□□",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#12b886",
+              "sort": 3
+            }
+          ],
+          "place": {
+            "id": "81e3835e-e261-4dd0-b343-482b74ef09b2",
+            "name": "三宮の部屋",
+            "memo": "",
+            "sort": 8
+          }
+        }
+      },
+      {
+        "id": "211caadf-8a80-4daa-8ccf-32156e787805",
+        "title": "客室で仕事",
+        "start": "2025-05-24T12:00:00.000Z",
+        "end": "2025-05-24T13:00:00.000Z",
+        "borderColor": "#fd7e14",
+        "backgroundColor": "#fd7e14",
+        "extendedProps": {
+          "characters": [
+            {
+              "id": "1",
+              "name": "一宮",
+              "playerName": "○○",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#fa5252",
+              "sort": 1
+            }
+          ],
+          "place": {
+            "id": "9b61b003-96ab-4282-91b1-befbe88c1a68",
+            "name": "一宮の部屋",
+            "memo": "",
+            "sort": 6
+          }
+        }
+      },
+      {
+        "id": "98ccc789-cb8d-4f68-a727-0e54ed6d8d20",
+        "title": "大広間で雑談",
+        "start": "2025-05-24T12:00:00.000Z",
+        "end": "2025-05-24T13:00:00.000Z",
+        "borderColor": "#7950f2",
+        "backgroundColor": "#7950f2",
+        "extendedProps": {
+          "characters": [
+            {
+              "id": "2",
+              "name": "二宮",
+              "playerName": "△△",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#fab005",
+              "sort": 2
+            },
+            {
+              "id": "3",
+              "name": "三宮",
+              "playerName": "□□",
+              "memo": "年齢や性格などの基本情報",
+              "color": "#12b886",
+              "sort": 3
+            }
+          ],
+          "place": {
+            "id": "2",
+            "name": "大広間",
+            "memo": "",
+            "sort": 2
+          }
+        }
+      },
+      {
+        "id": "b36179e3-b7ed-4467-b34a-99516e82fa03",
+        "title": "倉庫整理",
+        "start": "2025-05-24T12:00:00.000Z",
+        "end": "2025-05-24T13:00:00.000Z",
+        "borderColor": "#fd7e14",
+        "backgroundColor": "#fd7e14",
+        "extendedProps": {
+          "witness": {
+            "id": "character-npc",
+            "name": "NPC",
+            "color": "#868e96",
+            "sort": 99
+          },
+          "characters": [
+            {
+              "id": "b46a4732-32da-4544-9a1a-bf007c92cc1c",
+              "name": "零士",
+              "playerName": "××",
+              "color": "#868e96",
+              "memo": "",
+              "sort": 4
+            }
+          ],
+          "place": {
+            "id": "cd7fc6d9-5c42-46a0-8e09-09ebfd89a550",
+            "name": "倉庫",
+            "memo": "",
+            "sort": 4
+          }
+        }
+      }
+    ],
+    "config": {
+      "interval": "01:00",
+      "timeAmount": "06:00:00",
+      "timelineStartTime": "18:00:00",
+      "timelineEndTime": "24:00:00",
+      "witnesses": [
+        {
+          "id": "1",
+          "name": "一宮",
+          "playerName": "○○",
+          "memo": "年齢や性格などの基本情報",
+          "color": "#fa5252",
+          "sort": 1
+        },
+        {
+          "id": "2",
+          "name": "二宮",
+          "playerName": "△△",
+          "memo": "年齢や性格などの基本情報",
+          "color": "#fab005",
+          "sort": 2
+        },
+        {
+          "id": "3",
+          "name": "三宮",
+          "playerName": "□□",
+          "memo": "年齢や性格などの基本情報",
+          "color": "#12b886",
+          "sort": 3
+        },
+        {
+          "id": "b46a4732-32da-4544-9a1a-bf007c92cc1c",
+          "name": "零士",
+          "playerName": "××",
+          "color": "#868e96",
+          "memo": "",
+          "sort": 4
+        },
+        {
+          "id": "character-npc",
+          "name": "NPC",
+          "color": "#868e96",
+          "sort": 99
+        }
+      ],
+      "characters": [
+        {
+          "id": "1",
+          "name": "一宮",
+          "playerName": "○○",
+          "memo": "年齢や性格などの基本情報",
+          "color": "#fa5252",
+          "sort": 1
+        },
+        {
+          "id": "2",
+          "name": "二宮",
+          "playerName": "△△",
+          "memo": "年齢や性格などの基本情報",
+          "color": "#fab005",
+          "sort": 2
+        },
+        {
+          "id": "3",
+          "name": "三宮",
+          "playerName": "□□",
+          "memo": "年齢や性格などの基本情報",
+          "color": "#12b886",
+          "sort": 3
+        },
+        {
+          "id": "b46a4732-32da-4544-9a1a-bf007c92cc1c",
+          "name": "零士",
+          "playerName": "××",
+          "color": "#868e96",
+          "memo": "",
+          "sort": 4
+        }
+      ],
+      "places": [
+        {
+          "id": "1",
+          "name": "零士の書斎",
+          "memo": "",
+          "sort": 1
+        },
+        {
+          "id": "2",
+          "name": "大広間",
+          "memo": "",
+          "sort": 2
+        },
+        {
+          "id": "3",
+          "name": "調理室",
+          "memo": "",
+          "sort": 3
+        },
+        {
+          "id": "cd7fc6d9-5c42-46a0-8e09-09ebfd89a550",
+          "name": "倉庫",
+          "memo": "",
+          "sort": 4
+        },
+        {
+          "id": "6a08790a-79e6-45a9-9a3d-9ee4f815e766",
+          "name": "廊下",
+          "memo": "",
+          "sort": 5
+        },
+        {
+          "id": "9b61b003-96ab-4282-91b1-befbe88c1a68",
+          "name": "一宮の部屋",
+          "memo": "",
+          "sort": 6
+        },
+        {
+          "id": "8644afc9-04d8-43e6-a7ac-fa2f7b64c3e2",
+          "name": "二宮の部屋",
+          "memo": "",
+          "sort": 7
+        },
+        {
+          "id": "81e3835e-e261-4dd0-b343-482b74ef09b2",
+          "name": "三宮の部屋",
+          "memo": "",
+          "sort": 8
+        }
+      ],
+      "timeSlots": [
+        {
+          "value": "2025-05-24T09:00:00.000Z",
+          "label": "18:00"
+        },
+        {
+          "value": "2025-05-24T10:00:00.000Z",
+          "label": "19:00"
+        },
+        {
+          "value": "2025-05-24T11:00:00.000Z",
+          "label": "20:00"
+        },
+        {
+          "value": "2025-05-24T12:00:00.000Z",
+          "label": "21:00"
+        }
+      ],
+      "prologue": "",
+      "memo": "人里離れた島、ひっそりと佇む洋館。\n館の持ち主は零士と呼ばれる60代の男性。\nそこに住み込みで芸術を生業とする3人の男女。\n\nある夜、書斎で死んでいる零士が発見される。\n容疑者となるのは芸術家の3人。\n\n使用人が通報し、警察が到着するまでの間、\nそれぞれの思惑が交差する。"
+    }
+  }
+}

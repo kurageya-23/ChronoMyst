@@ -13,7 +13,6 @@ export const editEventModalValidator: FormValidateInput<TimelineEventFormData> =
       if (values.endDateTimeStr) {
         const start = new Date(value);
         const end = new Date(values.endDateTimeStr);
-        console.log(start, end);
         if (start >= end) {
           return "開始時間は終了時間より前にしてください";
         }
