@@ -2,8 +2,13 @@ import { useDispatch, useSelector } from "react-redux";
 import type { RootState } from "../../../app/store";
 import { mapSlice } from "../../../features/map/mapSlice";
 import type { FileWithPath } from "@mantine/dropzone";
-import { timelineSlice } from "../../../features/timelines/timelineSlice";
+import {
+  getTimeSlots,
+  timelineSlice,
+} from "../../../features/timelines/timelineSlice";
 import { mapSelectors } from "../../../features/map/selectors";
+import { useMemo } from "react";
+import type { SelectOption } from "../../../features/models";
 
 /**
  * マップビューに関するカスタムフック
@@ -28,7 +33,10 @@ export const useMapView = () => {
     dispatch(mapSlice.actions.updateSelectedTime(value ?? ""));
   };
 
-  const timeSlots = timeline.config.timeSlots;
+  const timeSlots = useMemo<SelectOption[]>(
+    () => getTimeSlots(timeline.config),
+    [timeline.config]
+  );
 
   return {
     mapData,

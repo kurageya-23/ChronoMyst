@@ -15,9 +15,10 @@ import {
   DEFAULT_WITNESS,
 } from "../../app/appConstants";
 import { toMinute } from "../../app/util";
+import deepmerge from "deepmerge";
 
 /** 時間間隔からスロットを生成 */
-const getTimeSlots = (config: TimelineConfig): SelectOption[] => {
+export const getTimeSlots = (config: TimelineConfig): SelectOption[] => {
   const intervalMin = toMinute(config.interval);
   const totalMin = toMinute(config.timeAmount);
   const count = Math.floor(totalMin / intervalMin);
@@ -155,9 +156,12 @@ export const timelineSlice = createAppSlice({
     /** Jsonファイルのインポート */
     jsonImport: create.reducer((state, action: PayloadAction<Timeline>) => {
       console.debug("[reducer] jsonImport start.", action.payload);
-      // まるごと上書き
-      Object.assign(state, action.payload);
+      // Immer + deepmerge で in-place にマージ
+      const merged = deepmerge(state, action.payload, {
+        arrayMerge: (_destinationArray, sourceArray) => sourceArray,
+      });
       console.debug("[reducer] jsonImport end.");
+      return merged;
     }),
   }),
   selectors: {
