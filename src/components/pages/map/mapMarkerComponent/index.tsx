@@ -47,8 +47,8 @@ export const MapMarkerComponent: React.FC<MapMarkerComponentProps> = ({
         cursor: "move",
         ...dragStyle,
       }}
-      {...attributes}
-      {...listeners}
+      {...(attributes ?? {})}
+      {...(listeners ?? {})}
     >
       <Paper shadow="sm" radius="md" px={6} py={4}>
         <Text size={size}>{marker.place?.name}</Text>
