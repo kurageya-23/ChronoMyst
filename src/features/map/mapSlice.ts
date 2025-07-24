@@ -6,6 +6,7 @@ import { type MapData, type MapMarker } from "../models";
 const initialMapData: MapData = {
   mapImage: "",
   mapMarkers: [],
+  selectedTime: "",
 };
 
 export const mapSlice = createAppSlice({
@@ -49,6 +50,14 @@ export const mapSlice = createAppSlice({
       );
       console.debug("[reducer] deleteMapMarker end.");
     }),
+    /** selectedTimeの更新 */
+    updateSelectedTime: create.reducer(
+      (state, action: PayloadAction<string>) => {
+        console.debug("[reducer] updateSelectedTime start.", action.payload);
+        state.selectedTime = action.payload;
+        console.debug("[reducer] updateSelectedTime end.");
+      }
+    ),
   }),
   selectors: {
     selectMapData: (mapData) => mapData,

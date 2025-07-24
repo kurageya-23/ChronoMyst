@@ -1,13 +1,17 @@
 import { createSelector } from "@reduxjs/toolkit";
 import type { RootState } from "../../app/store";
 import { mapSlice } from "./mapSlice";
-import type { MapData, MapMarker } from "../models";
-
-// 生の slice 状態を取ってくるセレクタ
+import type {
+  MapData,
+  MapMarker,
+  TimelineConfig,
+  TimelineEvent,
+} from "../models";
+import { toMinute } from "../../app/util";
 const selectRaw = (state: RootState) => state[mapSlice.reducerPath];
-
-// timeline.config.places を取ってくるセレクタ
 const selectPlaces = (state: RootState) => state.timeline.config.places;
+const timelineEvents = (state: RootState) => state.timeline.timelineEvents;
+const selectConfig = (state: RootState) => state.timeline.config;
 
 /** マップに関するセレクター */
 export const mapSelectors = {
@@ -25,6 +29,32 @@ export const mapSelectors = {
             pos: m.pos,
           } as MapMarker)
       ),
+      selectedTime: mapStoreData.selectedTime,
     })
+  ),
+  selectAlibi: createSelector(
+    [selectConfig, timelineEvents],
+    (config: TimelineConfig, timelineEvents: TimelineEvent[]) => {
+      // スロット間隔(ms)を計算
+      const intervalMs = toMinute(config.interval) * 60 * 1000;
+
+      // スロットごとにイベントをフィルタ→オブジェクト化
+      return config.timeSlots.reduce<
+        Record<string, { timelineEvent: TimelineEvent[] }>
+      >((acc, slotIso) => {
+        const slotStart = new Date(slotIso.value).getTime();
+        const slotEnd = slotStart + intervalMs;
+
+        // slotStart ～ slotEnd の間に一部でもかかるイベントを抽出
+        const matched = timelineEvents.filter((evt) => {
+          const start = new Date(evt.start).getTime();
+          const end = new Date(evt.end).getTime();
+          return start < slotEnd && end > slotStart;
+        });
+
+        acc[slotIso.value] = { timelineEvent: matched };
+        return acc;
+      }, {});
+    }
   ),
 };

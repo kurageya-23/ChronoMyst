@@ -2,6 +2,12 @@ import type { EventApi } from "@fullcalendar/core";
 import { v4 as uuidv4 } from "uuid";
 
 /** --------データモデル-------- */
+// プルダウンのオプション（ライブラリ準拠）
+export type SelectOption = {
+  value: string;
+  label: string;
+};
+
 // シナリオ
 export type Scenario = {
   name: string;
@@ -99,6 +105,7 @@ export type TimelineConfig = {
   characters: Character[];
   places: Place[];
   prologue: string;
+  timeSlots: SelectOption[];
 };
 
 // タイムライン
@@ -122,6 +129,7 @@ export type TimelineJson = {
 export type MapData = {
   mapImage: string;
   mapMarkers: MapMarker[];
+  selectedTime: string;
 };
 
 /** マップマーカーの位置 */

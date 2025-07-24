@@ -50,7 +50,7 @@ export const useMapContainer = (
   };
 
   /** マーカー位置更新 */
-  const handleDragEnd = (event: DragEndEvent) => {
+  const handleUpdateMarker = (event: DragEndEvent) => {
     const { active, delta } = event;
     const placeId = active.id as string;
     const marker = mapData.mapMarkers.find((m) => m.placeId === placeId);
@@ -75,5 +75,10 @@ export const useMapContainer = (
     }
   };
 
-  return { mapData, markerPlaces, handleAddMarker, handleDragEnd };
+  return {
+    mapData,
+    markerPlaces,
+    handleAddMarker,
+    handleUpdateMarker,
+  };
 };

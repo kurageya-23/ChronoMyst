@@ -19,10 +19,10 @@ type MapContainerProps = {
 export const MapContainer: React.FC<MapContainerProps> = ({ markerSize }) => {
   // マッププレビューのref
   const transformWrapperRef = useRef<ReactZoomPanPinchRef>(null);
-  const { mapData, markerPlaces, handleAddMarker, handleDragEnd } =
+  const { mapData, markerPlaces, handleAddMarker, handleUpdateMarker } =
     useMapContainer(transformWrapperRef);
   return (
-    <DndContext onDragEnd={handleDragEnd}>
+    <DndContext onDragEnd={handleUpdateMarker}>
       <Stack>
         {/* マップビュー */}
         <MapView

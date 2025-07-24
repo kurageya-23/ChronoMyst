@@ -1,4 +1,11 @@
-import { ActionIcon, Drawer, Group, Stack, Tooltip } from "@mantine/core";
+import {
+  ActionIcon,
+  Drawer,
+  Group,
+  Select,
+  Stack,
+  Tooltip,
+} from "@mantine/core";
 import { IconExchangeFilled } from "@tabler/icons-react";
 import { useMapView } from "./hooks";
 import { useRef, useState } from "react";
@@ -12,9 +19,8 @@ export type MapViewProps = {
 };
 /** マップビュー */
 export default function MapView({ opened, onClose }: MapViewProps) {
-  const imageContainerRef = useRef<HTMLDivElement>(null);
   const dropzoneOpenRef = useRef<() => void>(null);
-  const { mapData, onFileDrop } = useMapView(imageContainerRef);
+  const { mapData, onFileDrop, timeSlots, onTimeChange } = useMapView();
 
   const [markerSize, setMarkerSize] = useState<string>("md");
 
@@ -49,6 +55,13 @@ export default function MapView({ opened, onClose }: MapViewProps) {
               value={markerSize}
               onChange={(v) => setMarkerSize(v ?? "md")}
               tooltip="マーカーサイズ"
+            />
+
+            {/* 時間選択 */}
+            <Select
+              data={timeSlots}
+              value={mapData.selectedTime}
+              onChange={onTimeChange}
             />
           </Group>
 
