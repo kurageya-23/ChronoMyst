@@ -58,7 +58,7 @@ export const MapMarkerComponent: React.FC<MapMarkerComponentProps> = ({
             return (
               <Fieldset key={ev.id} p={4}>
                 <Stack gap={2}>
-                  {ev.extendedProps.characters.map((c) => (
+                  {(ev.extendedProps.characters ?? []).map((c) => (
                     <Badge key={c.id} size={size} color={c.color}>
                       {c.name}
                     </Badge>
