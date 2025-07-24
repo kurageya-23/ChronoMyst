@@ -50,6 +50,7 @@ export const useLayout = () => {
           text = text.slice(1);
         }
         const parsed = JSON.parse(text);
+        console.debug("[handleImport] parsed json", parsed);
 
         // 型チェック
         if (
@@ -83,6 +84,8 @@ export const useLayout = () => {
       version: appVersion,
       data: timeline,
     } as TimelineJson;
+
+    console.debug("[handleExport] exportData", exportData);
 
     // 2. ファイル名を組み立て
     const dateStr = getTodayString();

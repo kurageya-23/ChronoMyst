@@ -9,6 +9,7 @@ import { RouterProvider } from "react-router-dom";
 // UIフレームワーク
 import "@mantine/core/styles.css";
 import "@mantine/dates/styles.css";
+import "@mantine/dropzone/styles.css";
 import { MantineProvider } from "@mantine/core";
 
 // Redux

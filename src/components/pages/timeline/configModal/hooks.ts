@@ -27,6 +27,7 @@ export const useTimelineConfig = (opened: boolean, onClose: () => void) => {
       characters: config.characters.map((c) => ({ ...c })),
       places: config.places.map((p) => ({ ...p })),
       prologue: config.prologue,
+      timeSlots: config.timeSlots,
     }),
     [config]
   );
