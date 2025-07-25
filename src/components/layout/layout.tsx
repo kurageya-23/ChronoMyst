@@ -57,14 +57,7 @@ export const Layout = () => {
     useDisclosure(false);
 
   return (
-    <AppShell
-      header={{ height: 40 }}
-      padding="sm"
-      navbar={{
-        width: 40,
-        breakpoint: "sm",
-      }}
-    >
+    <AppShell header={{ height: 40 }} padding="sm">
       {/* ヘッダーメニュー */}
       <AppShell.Header>
         <Grid h="100%" justify="space-between" align="center" px="lg">
