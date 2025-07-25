@@ -1,13 +1,8 @@
-.mantine-AppShell-main {
-  padding-top: 44px !important;
-}
-
 /* タイムラインテーブルの設定 */
 /* 動的に外部ヘッダー/フッター分を引いた高さを設定 */
 /* --header-height, --footer-height を上位で定義すると自動反映 */
 .timeline-container {
   width: 100%;
-  height: 100%;
   height: calc(100vh - var(--header-height, 64px) - var(--footer-height, 0px));
   overflow-y: auto;
 }
