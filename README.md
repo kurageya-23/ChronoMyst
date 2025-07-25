@@ -5,7 +5,11 @@
 
 ## デモ
 
-https://chrono-myst.netlify.app/
+[Demo](https://chrono-myst.netlify.app/)
+
+## 📚ドキュメント
+
+[ユーザーガイド](https://kurageya23.notion.site/ChronoMyst-23b3c5c0bc4980aebe53efe2cf9d3721)
 
 ## - 登場人物たちの複雑難解な行動を整理します
 

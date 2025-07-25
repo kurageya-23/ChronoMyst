@@ -42,13 +42,10 @@ export const MapMarkerComponent: React.FC<MapMarkerComponentProps> = ({
   console.log("[bugfix]alibiAll:", alibiAll);
   console.log("[bugfix]alibi:", alibi);
   console.log("[bugfix]mapData", mapData);
-  console.log(
-    "[bugfix]attributes, listeners, setNodeRef, transform",
-    attributes,
-    listeners,
-    setNodeRef,
-    transform
-  );
+  console.log("[bugfix]attributes", attributes);
+  console.log("[bugfix]listeners", listeners);
+  console.log("[bugfix]setNodeRef", setNodeRef);
+  console.log("[bugfix]transform", transform);
 
   return (
     <div
