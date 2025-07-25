@@ -23,8 +23,8 @@ export default function DynamicList<T>({
   min,
   errorMessage,
 }: DynamicListProps<T>) {
-  const canAdd = items.length < max;
-  const canRemove = items.length > min;
+  const canAdd = (items?.length ?? 0) < max;
+  const canRemove = (items?.length ?? 0) > min;
 
   return (
     <>

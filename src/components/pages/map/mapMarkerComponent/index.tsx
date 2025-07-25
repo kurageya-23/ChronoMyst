@@ -25,11 +25,13 @@ export const MapMarkerComponent: React.FC<MapMarkerComponentProps> = ({
 
   const mapData = useSelector(mapSelectors.selectMapData);
 
-  // TODO: アリバイデータを取得
   const alibiAll = useSelector(mapSelectors.selectAlibi);
   const alibi = useMemo(() => {
-    return alibiAll[mapData.selectedTime]?.timelineEvent ?? [];
-  }, [mapData.selectedTime, alibiAll]);
+    const selected = alibiAll?.[mapData?.selectedTime];
+    return selected?.timelineEvent ?? [];
+  }, [mapData?.selectedTime, alibiAll]);
+
+  if (!alibiAll || !mapData?.selectedTime) return null;
 
   // ドラッグにカーソルを追従させる
   const dragStyle = transform
