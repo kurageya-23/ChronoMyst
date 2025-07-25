@@ -17,29 +17,16 @@ export const MapMarkerComponent: React.FC<MapMarkerComponentProps> = ({
   marker,
   size,
 }) => {
-  // ❗ Hookは必ず関数の先頭で呼ぶ
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: marker.placeId,
+  });
   const mapData = useSelector(mapSelectors.selectMapData);
   const alibiAll = useSelector(mapSelectors.selectAlibi);
-
-  const selectedTime = mapData?.selectedTime;
-
   const alibi = useMemo(() => {
-    const selected = alibiAll?.[selectedTime];
-    return selected?.timelineEvent ?? [];
-  }, [selectedTime, alibiAll]);
+    return alibiAll[mapData.selectedTime]?.timelineEvent ?? [];
+  }, [mapData.selectedTime, alibiAll]);
 
-  if (!marker.placeId) {
-    console.log("❗marker.placeId is undefined");
-  }
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: marker.placeId ?? "unknown",
-  });
-
-  // ❗ 条件付きレンダーはここで行う
-  if (!marker?.placeId || !selectedTime || !alibiAll) {
-    return null;
-  }
-
+  // ドラッグにカーソルを追従させる
   const dragStyle = transform
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,

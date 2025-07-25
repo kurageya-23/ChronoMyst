@@ -10,7 +10,6 @@ import type {
 } from "../models";
 import { toMinute } from "../../app/util";
 import { getTimeSlots } from "../timelines/timelineSlice";
-import { useMemo } from "react";
 const selectRaw = (state: RootState) => state[mapSlice.reducerPath];
 const selectPlaces = (state: RootState) => state.timeline.config.places;
 const timelineEvents = (state: RootState) => state.timeline.timelineEvents;
@@ -41,10 +40,7 @@ export const mapSelectors = {
       // スロット間隔(ms)を計算
       const intervalMs = toMinute(config.interval) * 60 * 1000;
 
-      const timeSlots = useMemo<SelectOption[]>(
-        () => getTimeSlots(config),
-        [config]
-      );
+      const timeSlots: SelectOption[] = getTimeSlots(config);
 
       // スロットごとにイベントをフィルタ→オブジェクト化
       return timeSlots.reduce<
