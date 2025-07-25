@@ -17,37 +17,35 @@ export const MapMarkerComponent: React.FC<MapMarkerComponentProps> = ({
   marker,
   size,
 }) => {
-  console.log("[bugfix]marker:", marker);
+  // ❗ Hookは必ず関数の先頭で呼ぶ
+  const mapData = useSelector(mapSelectors.selectMapData);
+  const alibiAll = useSelector(mapSelectors.selectAlibi);
 
+  const selectedTime = mapData?.selectedTime;
+
+  const alibi = useMemo(() => {
+    const selected = alibiAll?.[selectedTime];
+    return selected?.timelineEvent ?? [];
+  }, [selectedTime, alibiAll]);
+
+  if (!marker.placeId) {
+    console.log("❗marker.placeId is undefined");
+  }
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: marker.placeId,
+    id: marker.placeId ?? "unknown",
   });
 
-  const mapData = useSelector(mapSelectors.selectMapData);
+  // ❗ 条件付きレンダーはここで行う
+  if (!marker?.placeId || !selectedTime || !alibiAll) {
+    return null;
+  }
 
-  const alibiAll = useSelector(mapSelectors.selectAlibi);
-  const alibi = useMemo(() => {
-    const selected = alibiAll?.[mapData?.selectedTime];
-    return selected?.timelineEvent ?? [];
-  }, [mapData?.selectedTime, alibiAll]);
-
-  if (!alibiAll || !mapData?.selectedTime) return null;
-
-  // ドラッグにカーソルを追従させる
   const dragStyle = transform
     ? {
         transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
         zIndex: 999,
       }
     : {};
-
-  console.log("[bugfix]alibiAll:", alibiAll);
-  console.log("[bugfix]alibi:", alibi);
-  console.log("[bugfix]mapData", mapData);
-  console.log("[bugfix]attributes", attributes);
-  console.log("[bugfix]listeners", listeners);
-  console.log("[bugfix]setNodeRef", setNodeRef);
-  console.log("[bugfix]transform", transform);
 
   return (
     <div
