@@ -52,6 +52,7 @@ export const MapView: React.FC<MapViewProps> = ({
   mapData,
   markerSize,
 }: MapViewProps) => {
+  const scale = transformWrapperRef.current?.state.scale ?? 1;
   return (
     <TransformWrapper
       onInit={(api) => {
@@ -69,7 +70,12 @@ export const MapView: React.FC<MapViewProps> = ({
           />
           {/* マーカー配置 */}
           {mapData.mapMarkers.map((m) => (
-            <MapMarkerComponent key={m.placeId} marker={m} size={markerSize} />
+            <MapMarkerComponent
+              key={m.placeId}
+              marker={m}
+              size={markerSize}
+              mapScale={scale}
+            />
           ))}
         </div>
       </TransformComponent>

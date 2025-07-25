@@ -8,6 +8,7 @@ import { useMemo } from "react";
 type MapMarkerComponentProps = {
   marker: MapMarker;
   size: string;
+  mapScale: number;
 };
 
 /**
@@ -16,6 +17,7 @@ type MapMarkerComponentProps = {
 export const MapMarkerComponent: React.FC<MapMarkerComponentProps> = ({
   marker,
   size,
+  mapScale,
 }) => {
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: marker.placeId,
@@ -29,7 +31,9 @@ export const MapMarkerComponent: React.FC<MapMarkerComponentProps> = ({
   // ドラッグにカーソルを追従させる
   const dragStyle = transform
     ? {
-        transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,
+        transform: `translate3d(${transform.x / mapScale}px, ${
+          transform.y / mapScale
+        }px, 0)`,
         zIndex: 999,
       }
     : {};

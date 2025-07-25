@@ -59,11 +59,11 @@ export const useMapContainer = (
       const wrapper = transformWrapperRef.current;
       if (!wrapper?.instance?.wrapperComponent) return;
 
-      const { scale, positionX, positionY } = wrapper.state;
+      const { scale } = wrapper.state;
 
       // ドラッグ後の絶対座標 data.x, data.y を相対座標に逆変換
-      const x = (marker.pos.x + delta.x - positionX) / scale;
-      const y = (marker.pos.y + delta.y - positionY) / scale;
+      const x = marker.pos.x + delta.x / scale;
+      const y = marker.pos.y + delta.y / scale;
 
       dispatch(
         mapSlice.actions.updateMapMarker({

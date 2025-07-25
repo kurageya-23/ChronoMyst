@@ -14,14 +14,13 @@ export const MapNewMarkerList: React.FC<NewMarkerListProps> = ({
   handleAddMarker,
 }) => {
   return (
-    <Fieldset legend="場所マーカー" p="xs">
+    <Fieldset legend="クリックでマップに追加します" p="xs">
       <Group>
         {places.map((p) => (
           <Button
             key={p.id}
-            size="md"
+            size="sm"
             color="red"
-            variant="filled"
             onClick={() => handleAddMarker(p)}
           >
             {p.name}
