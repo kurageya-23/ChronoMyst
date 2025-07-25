@@ -38,6 +38,10 @@ export const useMapView = () => {
     [timeline.config]
   );
 
+  // 時間が選択されていない場合、timeSlotsの最初の時間をセット
+  if (!mapData?.selectedTime)
+    dispatch(mapSlice.actions.updateSelectedTime(timeSlots[0].value));
+
   return {
     mapData,
     onFileDrop,
